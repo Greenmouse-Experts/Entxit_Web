@@ -133,19 +133,19 @@ function DashboardPage() {
                   <div key={index} className="flex-1 flex flex-col items-center gap-2">
                     <div className="w-full flex flex-col items-center gap-0.5">
                       <div
-                        className="w-full bg-[#165757] hover:bg-[#134645] transition-colors cursor-pointer"
+                        className="w-full bg-primary hover:bg-primary/90 transition-colors cursor-pointer"
                         style={{
                           height: `${(data.residents / 1500) * 150}px`,
                         }}
                       />
                       <div
-                        className="w-full bg-[#1a8f5f] hover:bg-[#157a4f] transition-colors cursor-pointer"
+                        className="w-full bg-success hover:bg-success/90 transition-colors cursor-pointer"
                         style={{
                           height: `${(data.guards / 70) * 60}px`,
                         }}
                       />
                       <div
-                        className="w-full bg-[#26a877] hover:bg-[#1f8f64] transition-colors cursor-pointer"
+                        className="w-full bg-success hover:bg-success/90 transition-colors cursor-pointer"
                         style={{
                           height: `${(data.subAdmins / 15) * 40}px`,
                         }}
@@ -159,15 +159,15 @@ function DashboardPage() {
               </div>
               <div className="mt-6 flex items-center justify-center gap-6">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-[#165757] rounded" />
+                  <div className="w-3 h-3 bg-primary rounded" />
                   <span className="text-sm text-gray-600">Residents</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-[#1a8f5f] rounded" />
+                  <div className="w-3 h-3 bg-success rounded" />
                   <span className="text-sm text-gray-600">Guards</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-[#26a877] rounded" />
+                  <div className="w-3 h-3 bg-success rounded" />
                   <span className="text-sm text-gray-600">Sub-admins</span>
                 </div>
               </div>

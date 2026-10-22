@@ -1,159 +1,106 @@
-import { X } from 'lucide-react'
-import { useEffect, type ReactNode } from 'react'
-import { cn } from '../../lib/utils'
+import {
+	Dialog,
+	DialogBackdrop,
+	DialogPanel,
+	DialogTitle,
+} from "@headlessui/react";
+import { X } from "lucide-react";
+import type { ReactNode } from "react";
+import { cn } from "../../lib/utils";
 
 interface BottomSheetProps {
-  isOpen: boolean
-  onClose: () => void
-  children: ReactNode
-  title?: string
-  size?: 'sm' | 'md' | 'lg' | 'full'
+	isOpen: boolean;
+	onClose: () => void;
+	children: ReactNode;
+	title?: string;
+	size?: "sm" | "md" | "lg" | "full";
 }
+
+const sizeClasses = {
+	sm: "h-[40vh]",
+	md: "h-[60vh]",
+	lg: "h-[85vh]",
+	full: "h-[95vh]",
+};
 
 export const BottomSheet = ({
-  isOpen,
-  onClose,
-  children,
-  title,
-  size = 'lg',
-}: BottomSheetProps) => {
-  // Prevent body scroll when bottom sheet is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-    return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [isOpen])
-
-  // Close on escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose()
-      }
-    }
-    window.addEventListener('keydown', handleEscape)
-    return () => window.removeEventListener('keydown', handleEscape)
-  }, [isOpen, onClose])
-
-  const sizeClasses = {
-    sm: 'h-[40vh]',
-    md: 'h-[60vh]',
-    lg: 'h-[85vh]',
-    full: 'h-[95vh]',
-  }
-
-  if (!isOpen) return null
-
-  return (
-    <>
-      {/* Backdrop */}
-      <div
-        className={cn(
-          'fixed inset-0 bg-black/50 z-50 transition-opacity duration-300',
-          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        )}
-        onClick={onClose}
-      />
-
-      {/* Bottom Sheet */}
-      <div
-        className={cn(
-          'fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 flex flex-col transition-transform duration-500 ease-out',
-          sizeClasses[size],
-          isOpen ? 'translate-y-0' : 'translate-y-full'
-        )}
-        style={{
-          animation: isOpen ? 'slideUp 0.5s ease-out' : 'slideDown 0.3s ease-in',
-        }}
-      >
-        {/* Handle Bar */}
-        <div className="flex justify-center pt-3 pb-2">
-          <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
-        </div>
-
-        {/* Header */}
-        {title && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">{title}</h2>
-            <button
-              onClick={onClose}
-              className="cursor-pointer p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              aria-label="Close"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        )}
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
-          {children}
-        </div>
-      </div>
-
-      {/* Animations */}
-      <style>{`
-        @keyframes slideUp {
-          from {
-            transform: translateY(100%);
-          }
-          to {
-            transform: translateY(0);
-          }
-        }
-        @keyframes slideDown {
-          from {
-            transform: translateY(0);
-          }
-          to {
-            transform: translateY(100%);
-          }
-        }
-      `}</style>
-    </>
-  )
-}
+	isOpen,
+	onClose,
+	children,
+	title,
+	size = "lg",
+}: BottomSheetProps) => (
+	<Dialog open={isOpen} onClose={onClose} className="relative z-50">
+		<DialogBackdrop className="fixed inset-0 bg-neutral/50" />
+		<div className="fixed inset-0 flex items-end justify-center">
+			<DialogPanel
+				className={cn(
+					"flex w-full flex-col rounded-t-3xl border border-base-300 bg-base-100 shadow-xl",
+					sizeClasses[size],
+				)}
+			>
+				<div className="flex justify-center pb-2 pt-3" aria-hidden="true">
+					<div className="h-1.5 w-12 rounded-full bg-base-300" />
+				</div>
+				{title && (
+					<div className="flex items-center justify-between border-b border-base-300 px-6 py-4">
+						<DialogTitle className="text-xl font-bold text-base-content">
+							{title}
+						</DialogTitle>
+						<button
+							type="button"
+							onClick={onClose}
+							className="btn btn-ghost btn-square btn-sm"
+							aria-label="Close sheet"
+						>
+							<X className="size-5" aria-hidden="true" />
+						</button>
+					</div>
+				)}
+				<div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
+					{children}
+				</div>
+			</DialogPanel>
+		</div>
+	</Dialog>
+);
 
 interface BottomSheetHeaderProps {
-  children: ReactNode
-  className?: string
+	children: ReactNode;
+	className?: string;
 }
 
-export const BottomSheetHeader = ({ children, className }: BottomSheetHeaderProps) => {
-  return (
-    <div className={cn('mb-6', className)}>
-      {children}
-    </div>
-  )
-}
+export const BottomSheetHeader = ({
+	children,
+	className,
+}: BottomSheetHeaderProps) => (
+	<div className={cn("mb-6", className)}>{children}</div>
+);
 
 interface BottomSheetTitleProps {
-  children: ReactNode
-  className?: string
+	children: ReactNode;
+	className?: string;
 }
 
-export const BottomSheetTitle = ({ children, className }: BottomSheetTitleProps) => {
-  return (
-    <h3 className={cn('text-2xl font-bold text-gray-900', className)}>
-      {children}
-    </h3>
-  )
-}
+export const BottomSheetTitle = ({
+	children,
+	className,
+}: BottomSheetTitleProps) => (
+	<DialogTitle
+		className={cn("text-2xl font-bold text-base-content", className)}
+	>
+		{children}
+	</DialogTitle>
+);
 
 interface BottomSheetDescriptionProps {
-  children: ReactNode
-  className?: string
+	children: ReactNode;
+	className?: string;
 }
 
-export const BottomSheetDescription = ({ children, className }: BottomSheetDescriptionProps) => {
-  return (
-    <p className={cn('text-gray-600 mt-2', className)}>
-      {children}
-    </p>
-  )
-}
+export const BottomSheetDescription = ({
+	children,
+	className,
+}: BottomSheetDescriptionProps) => (
+	<p className={cn("mt-2 text-base-content/70", className)}>{children}</p>
+);

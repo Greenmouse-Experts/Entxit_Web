@@ -15,8 +15,8 @@ function ReportsPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="p-6 bg-[#165757]/10 rounded-full">
-              <BarChart3 className="w-16 h-16 text-[#165757]" />
+            <div className="p-6 bg-primary/10 rounded-full">
+              <BarChart3 className="w-16 h-16 text-primary" />
             </div>
           </div>
           <h2 className="text-2xl font-bold text-gray-900">

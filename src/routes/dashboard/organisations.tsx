@@ -617,7 +617,7 @@ function OrganisationsPage() {
             {/* Host Info & Stats - Responsive Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {/* Host Info Card */}
-              <div className="lg:col-span-2 bg-gradient-to-r from-[#165757] to-[#1a8f5f] rounded-xl p-6 text-white relative overflow-hidden">
+              <div className="lg:col-span-2 bg-gradient-to-r from-primary to-success rounded-xl p-6 text-white relative overflow-hidden">
                 <div className="flex items-center justify-between relative z-10">
                   <div>
                     <h3 className="text-2xl font-bold">{selectedHost.name}</h3>
@@ -795,7 +795,7 @@ function OrganisationsPage() {
             {/* Security Info & Stats - Responsive Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
               {/* Security Info Card */}
-              <div className="lg:col-span-3 bg-gradient-to-r from-[#165757] to-[#1a8f5f] rounded-xl p-6 text-white relative overflow-hidden">
+              <div className="lg:col-span-3 bg-gradient-to-r from-primary to-success rounded-xl p-6 text-white relative overflow-hidden">
                 <div className="flex items-center justify-between relative z-10">
                   <div>
                     <h3 className="text-2xl font-bold">{selectedSecurity.name}</h3>

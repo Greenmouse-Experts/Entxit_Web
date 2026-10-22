@@ -1,80 +1,84 @@
-import { api, authUtils } from '../lib/api-client'
+import apiClient from "../lib/api-client";
+import {
+	clear_user,
+	get_user_value,
+	type ProfileData,
+	set_access_token,
+	set_profile_value,
+	set_user_value,
+	type UserData,
+} from "../store/authStore";
 
-// Types
 export interface LoginCredentials {
-  email: string
-  password: string
+	email: string;
+	password: string;
 }
 
 export interface LoginResponse {
-  token: string
-  user: {
-    id: string
-    email: string
-    name: string
-    role: string
-  }
+	token?: string;
+	accessToken?: string;
+	refreshToken?: string;
+	user:
+		| UserData
+		| {
+				id: string;
+				email: string;
+				name: string;
+				role: string;
+		  };
+	profile?: ProfileData;
 }
 
-export interface User {
-  id: string
-  email: string
-  name: string
-  role: string
-}
-
-// Auth Service
 export const authService = {
-  // Login admin user
-  login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
-    const response = await api.post<LoginResponse>('/api/v1/auth/login-admin', credentials)
-    
-    // Store token and user data
-    if (response.token) {
-      authUtils.setToken(response.token)
-      authUtils.setUser(response.user)
-    }
-    
-    return response
-  },
+	login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
+		const { data: response } = await apiClient.post<LoginResponse>(
+			"/auth/login-admin",
+			credentials,
+		);
+		const accessToken = response.accessToken ?? response.token;
+		if (!accessToken)
+			throw new Error("Login response did not include an access token");
 
-  // Logout
-  logout: () => {
-    authUtils.logout()
-  },
+		const user = response.user as UserData & { role?: string };
+		set_user_value({
+			accessToken,
+			refreshToken: response.refreshToken,
+			user: { ...user, userType: user.userType ?? user.role ?? "admin" },
+			profile: response.profile,
+		});
+		set_profile_value(response.profile ?? null);
+		return response;
+	},
 
-  // Get current user
-  getCurrentUser: (): User | null => {
-    return authUtils.getUser<User>()
-  },
-
-  // Check if authenticated
-  isAuthenticated: (): boolean => {
-    return authUtils.isAuthenticated()
-  },
-
-  // Register (if needed)
-  register: async (data: any): Promise<LoginResponse> => {
-    return api.post<LoginResponse>('/api/v1/auth/register', data)
-  },
-
-  // Forgot password
-  forgotPassword: async (email: string): Promise<{ message: string }> => {
-    return api.post<{ message: string }>('/api/v1/auth/forgot-password', { email })
-  },
-
-  // Reset password
-  resetPassword: async (token: string, password: string): Promise<{ message: string }> => {
-    return api.post<{ message: string }>('/api/v1/auth/reset-password', { token, password })
-  },
-
-  // Verify email
-  verifyEmail: async (token: string): Promise<{ message: string }> => {
-    return api.post<{ message: string }>('/api/v1/auth/verify-email', { token })
-  },
-
-  // Refresh token (if needed)
-  refreshToken: async (): Promise<{ token: string }> => {
-    return api.post<{ token: string }>('/api/v1/auth/refresh-token')
-  },
-}
+	logout: () => clear_user(),
+	getCurrentUser: (): UserData | null => get_user_value()?.user ?? null,
+	isAuthenticated: (): boolean => Boolean(get_user_value()?.accessToken),
+	register: async (data: unknown): Promise<LoginResponse> =>
+		(await apiClient.post<LoginResponse>("/auth/register", data)).data,
+	forgotPassword: async (email: string): Promise<{ message: string }> =>
+		(
+			await apiClient.post<{ message: string }>("/auth/forgot-password", {
+				email,
+			})
+		).data,
+	resetPassword: async (
+		token: string,
+		password: string,
+	): Promise<{ message: string }> =>
+		(
+			await apiClient.post<{ message: string }>("/auth/reset-password", {
+				token,
+				password,
+			})
+		).data,
+	verifyEmail: async (token: string): Promise<{ message: string }> =>
+		(await apiClient.post<{ message: string }>("/auth/verify-email", { token }))
+			.data,
+	refreshToken: async (): Promise<{ token: string }> => {
+		const { data: response } = await apiClient.post<{ token: string }>(
+			"/auth/refresh-token",
+		);
+		if (response.token) set_access_token(response.token);
+		return response;
+	},
+};

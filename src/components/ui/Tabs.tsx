@@ -1,109 +1,86 @@
-import { useState, createContext, useContext, type ReactNode } from 'react'
-import { cn } from '../../lib/utils'
-
-interface TabsContextType {
-  activeTab: string
-  setActiveTab: (value: string) => void
-}
-
-const TabsContext = createContext<TabsContextType | undefined>(undefined)
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
+import {
+	Children,
+	isValidElement,
+	type ReactElement,
+	type ReactNode,
+} from "react";
+import { cn } from "../../lib/utils";
 
 interface TabsProps {
-  defaultValue: string
-  children: ReactNode
-  className?: string
-}
-
-export const Tabs = ({ defaultValue, children, className }: TabsProps) => {
-  const [activeTab, setActiveTab] = useState(defaultValue)
-
-  return (
-    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
-      <div className={cn('w-full', className)}>{children}</div>
-    </TabsContext.Provider>
-  )
+	defaultValue: string;
+	children: ReactNode;
+	className?: string;
 }
 
 interface TabsListProps {
-  children: ReactNode
-  className?: string
-}
-
-export const TabsList = ({ children, className }: TabsListProps) => {
-  return (
-    <div
-      className={cn(
-        'inline-flex h-10 items-center justify-center rounded-lg bg-gray-100 p-1 text-gray-700',
-        className
-      )}
-    >
-      {children}
-    </div>
-  )
+	children: ReactNode;
+	className?: string;
 }
 
 interface TabsTriggerProps {
-  value: string
-  children: ReactNode
-  className?: string
-}
-
-export const TabsTrigger = ({
-  value,
-  children,
-  className,
-}: TabsTriggerProps) => {
-  const context = useContext(TabsContext)
-  if (!context) throw new Error('TabsTrigger must be used within Tabs')
-
-  const { activeTab, setActiveTab } = context
-  const isActive = activeTab === value
-
-  return (
-    <button
-      type="button"
-      onClick={() => setActiveTab(value)}
-      className={cn(
-        'inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-white transition-all cursor-pointer',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#165757] focus-visible:ring-offset-2',
-        'disabled:pointer-events-none disabled:opacity-50',
-        isActive
-          ? 'bg-white text-[#165757] shadow-sm font-semibold'
-          : 'text-gray-600 hover:text-[#165757]',
-        className
-      )}
-    >
-      {children}
-    </button>
-  )
+	value: string;
+	children: ReactNode;
+	className?: string;
 }
 
 interface TabsContentProps {
-  value: string
-  children: ReactNode
-  className?: string
+	value: string;
+	children: ReactNode;
+	className?: string;
 }
 
-export const TabsContent = ({
-  value,
-  children,
-  className,
-}: TabsContentProps) => {
-  const context = useContext(TabsContext)
-  if (!context) throw new Error('TabsContent must be used within Tabs')
+export const Tabs = ({ defaultValue, children, className }: TabsProps) => {
+	const nodes = Children.toArray(children).filter(isValidElement);
+	const list = nodes.find((node) => node.type === TabsList) as
+		| ReactElement<TabsListProps>
+		| undefined;
+	const panels = nodes.filter((node) => node.type === TabsContent);
+	const triggers = Children.toArray(list?.props.children).filter(
+		isValidElement,
+	) as ReactElement<TabsTriggerProps>[];
+	const defaultIndex = Math.max(
+		0,
+		triggers.findIndex((node) => node.props.value === defaultValue),
+	);
 
-  const { activeTab } = context
+	return (
+		<TabGroup defaultIndex={defaultIndex} className={cn("w-full", className)}>
+			{list}
+			<TabPanels>{panels}</TabPanels>
+		</TabGroup>
+	);
+};
 
-  if (activeTab !== value) return null
+export const TabsList = ({ children, className }: TabsListProps) => (
+	<TabList
+		className={cn(
+			"tabs tabs-box inline-flex flex-nowrap overflow-x-auto bg-base-200 p-1",
+			className,
+		)}
+	>
+		{children}
+	</TabList>
+);
 
-  return (
-    <div
-      className={cn(
-        'mt-2 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2',
-        className
-      )}
-    >
-      {children}
-    </div>
-  )
-}
+export const TabsTrigger = ({ children, className }: TabsTriggerProps) => (
+	<Tab
+		className={cn(
+			"tab whitespace-nowrap rounded-md text-base-content/70 data-selected:bg-base-100 data-selected:font-semibold data-selected:text-primary data-selected:shadow-sm focus-visible:outline-2 focus-visible:outline-primary",
+			className,
+		)}
+	>
+		{children}
+	</Tab>
+);
+
+export const TabsContent = ({ children, className }: TabsContentProps) => (
+	<TabPanel
+		className={cn(
+			"mt-2 focus-visible:outline-2 focus-visible:outline-primary",
+			className,
+		)}
+	>
+		{children}
+	</TabPanel>
+);

@@ -6,13 +6,13 @@ export const Route = createFileRoute('/')({ component: LandingPage })
 
 function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#165757]/5 via-white to-[#1a8f5f]/5">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-success/5">
       {/* Navbar */}
       <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-10 h-10 bg-[#165757] rounded-lg">
+              <div className="flex items-center justify-center w-10 h-10 bg-primary rounded-lg">
                 <span className="text-xl font-bold text-white">E</span>
               </div>
               <div>
@@ -21,13 +21,13 @@ function LandingPage() {
               </div>
             </div>
             <div className="flex items-center gap-6">
-              <a href="#features" className="text-sm text-gray-600 hover:text-[#165757] transition-colors">
+              <a href="#features" className="text-sm text-gray-600 hover:text-primary transition-colors">
                 Features
               </a>
-              <a href="#about" className="text-sm text-gray-600 hover:text-[#165757] transition-colors">
+              <a href="#about" className="text-sm text-gray-600 hover:text-primary transition-colors">
                 About
               </a>
-              <a href="#contact" className="text-sm text-gray-600 hover:text-[#165757] transition-colors">
+              <a href="#contact" className="text-sm text-gray-600 hover:text-primary transition-colors">
                 Contact
               </a>
               <Link to="/login">
@@ -43,7 +43,7 @@ function LandingPage() {
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-20">
         <div className="text-center max-w-4xl mx-auto">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-[#165757] rounded-2xl mb-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-primary rounded-2xl mb-8">
             <span className="text-4xl font-bold text-white">E</span>
           </div>
           <h1 className="text-6xl font-bold text-gray-900 mb-6">
@@ -70,22 +70,22 @@ function LandingPage() {
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-20">
           <FeatureCard
-            icon={<Shield className="w-8 h-8 text-[#165757]" />}
+            icon={<Shield className="w-8 h-8 text-primary" />}
             title="Security Management"
             description="Real-time security alerts and incident tracking with panic button integration"
           />
           <FeatureCard
-            icon={<Users className="w-8 h-8 text-[#1a8f5f]" />}
+            icon={<Users className="w-8 h-8 text-success" />}
             title="User Management"
             description="Manage residents, guards, and admins with role-based permissions"
           />
           <FeatureCard
-            icon={<BarChart3 className="w-8 h-8 text-[#165757]" />}
+            icon={<BarChart3 className="w-8 h-8 text-primary" />}
             title="Analytics & Reports"
             description="Comprehensive insights on usage, revenue, and user growth metrics"
           />
           <FeatureCard
-            icon={<Bell className="w-8 h-8 text-[#1a8f5f]" />}
+            icon={<Bell className="w-8 h-8 text-success" />}
             title="Announcements"
             description="System-wide broadcasts with scheduled delivery and priority levels"
           />

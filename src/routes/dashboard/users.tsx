@@ -91,7 +91,7 @@ function UsersPage() {
           <Card>
             <CardContent className="p-6">
               <div className="text-sm text-gray-600">Total Residents</div>
-              <div className="text-3xl font-bold text-[#165757] mt-2">
+              <div className="text-3xl font-bold text-primary mt-2">
                 {demoResidents.length}
               </div>
               <div className="text-xs text-gray-500 mt-1">
@@ -102,7 +102,7 @@ function UsersPage() {
           <Card>
             <CardContent className="p-6">
               <div className="text-sm text-gray-600">Security Guards</div>
-              <div className="text-3xl font-bold text-[#1a8f5f] mt-2">
+              <div className="text-3xl font-bold text-success mt-2">
                 {demoGuards.length}
               </div>
               <div className="text-xs text-gray-500 mt-1">
@@ -113,7 +113,7 @@ function UsersPage() {
           <Card>
             <CardContent className="p-6">
               <div className="text-sm text-gray-600">Sub-Admins</div>
-              <div className="text-3xl font-bold text-[#26a877] mt-2">
+              <div className="text-3xl font-bold text-success mt-2">
                 {demoSubAdmins.length}
               </div>
               <div className="text-xs text-gray-500 mt-1">
@@ -200,7 +200,7 @@ function UsersPage() {
                       <TableRow key={user.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-[#165757] rounded-full flex items-center justify-center text-white font-semibold">
+                            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-semibold">
                               {user.name
                                 .split(' ')
                                 .map((n) => n[0])
@@ -285,7 +285,7 @@ function UsersPage() {
                       <TableRow key={user.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-[#1a8f5f] rounded-full flex items-center justify-center text-white font-semibold">
+                            <div className="w-10 h-10 bg-success rounded-full flex items-center justify-center text-white font-semibold">
                               {user.name
                                 .split(' ')
                                 .map((n) => n[0])
@@ -370,7 +370,7 @@ function UsersPage() {
                       <TableRow key={user.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-[#26a877] rounded-full flex items-center justify-center text-white font-semibold">
+                            <div className="w-10 h-10 bg-success rounded-full flex items-center justify-center text-white font-semibold">
                               {user.name
                                 .split(' ')
                                 .map((n) => n[0])

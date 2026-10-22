@@ -40,21 +40,21 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-[#165757]/8 to-gray-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-primary/8 to-gray-50 relative overflow-hidden">
       {/* Animated Background Shapes - Enhanced */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Mesh gradient overlay */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(22,87,87,0.15)_0%,transparent_50%),radial-gradient(circle_at_80%_80%,rgba(38,168,119,0.15)_0%,transparent_50%),radial-gradient(circle_at_40%_90%,rgba(26,143,95,0.12)_0%,transparent_50%)]"></div>
+        <div className="absolute inset-0 auth-glow"></div>
         
         {/* Floating orbs */}
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[#165757]/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute top-1/4 right-0 w-[400px] h-[400px] bg-[#26a877]/25 rounded-full blur-3xl translate-x-1/3"></div>
-        <div className="absolute bottom-0 left-1/3 w-[450px] h-[450px] bg-[#1a8f5f]/20 rounded-full blur-3xl translate-y-1/3"></div>
-        <div className="absolute top-1/2 right-1/4 w-[350px] h-[350px] bg-[#165757]/15 rounded-full blur-2xl"></div>
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#26a877]/20 rounded-full blur-3xl -translate-x-1/4 translate-y-1/4"></div>
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute top-1/4 right-0 w-[400px] h-[400px] bg-success/25 rounded-full blur-3xl translate-x-1/3"></div>
+        <div className="absolute bottom-0 left-1/3 w-[450px] h-[450px] bg-success/20 rounded-full blur-3xl translate-y-1/3"></div>
+        <div className="absolute top-1/2 right-1/4 w-[350px] h-[350px] bg-primary/15 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-success/20 rounded-full blur-3xl -translate-x-1/4 translate-y-1/4"></div>
         
         {/* Subtle grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(22,87,87,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(22,87,87,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
+        <div className="absolute inset-0 auth-grid"></div>
       </div>
 
       {/* Main Content - Centered vertically */}
@@ -63,12 +63,12 @@ function LoginPage() {
           {/* Logo and title outside card */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">EntXit</h1>
-            <p className="text-sm text-[#165757] font-medium">Super Admin Portal</p>
+            <p className="text-sm text-primary font-medium">Super Admin Portal</p>
           </div>
 
           {/* Login Card */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200/50 p-8 relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#165757]/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
             
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h2>
@@ -130,7 +130,7 @@ function LoginPage() {
               </label>
               <button
                 type="button"
-                className="text-sm text-[#165757] hover:text-[#134645] font-medium disabled:opacity-50"
+                className="text-sm text-primary hover:text-primary/90 font-medium disabled:opacity-50"
                 disabled={isLoggingIn}
               >
                 Forgot Password?

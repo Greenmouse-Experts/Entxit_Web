@@ -141,7 +141,7 @@ function SubscriptionsPage() {
           <Card>
             <CardContent className="p-6">
               <div className="text-sm text-gray-600">MRR</div>
-              <div className="text-3xl font-bold text-[#1a8f5f] mt-2">
+              <div className="text-3xl font-bold text-success mt-2">
                 ₦
                 {demoSubscriptions
                   .filter((s) => s.status === 'active')
