@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAnnouncementsRouteImport } from './routes/dashboard/announcements'
@@ -33,100 +34,106 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRouteRoute = DashboardRouteRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
-  id: '/dashboard/',
-  path: '/dashboard/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardAnnouncementsRoute = DashboardAnnouncementsRouteImport.update({
-  id: '/dashboard/announcements',
-  path: '/dashboard/announcements',
-  getParentRoute: () => rootRouteImport,
+  id: '/announcements',
+  path: '/announcements',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardAuditLogsRoute = DashboardAuditLogsRouteImport.update({
-  id: '/dashboard/audit-logs',
-  path: '/dashboard/audit-logs',
-  getParentRoute: () => rootRouteImport,
+  id: '/audit-logs',
+  path: '/audit-logs',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardEntxitLogsRoute = DashboardEntxitLogsRouteImport.update({
-  id: '/dashboard/entxit-logs',
-  path: '/dashboard/entxit-logs',
-  getParentRoute: () => rootRouteImport,
+  id: '/entxit-logs',
+  path: '/entxit-logs',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardReportsRoute = DashboardReportsRouteImport.update({
-  id: '/dashboard/reports',
-  path: '/dashboard/reports',
-  getParentRoute: () => rootRouteImport,
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
-  id: '/dashboard/settings',
-  path: '/dashboard/settings',
-  getParentRoute: () => rootRouteImport,
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardSubscriptionPlanRoute =
   DashboardSubscriptionPlanRouteImport.update({
-    id: '/dashboard/subscription-plan',
-    path: '/dashboard/subscription-plan',
-    getParentRoute: () => rootRouteImport,
+    id: '/subscription-plan',
+    path: '/subscription-plan',
+    getParentRoute: () => DashboardRouteRoute,
   } as any)
 const DashboardSubscriptionsRoute = DashboardSubscriptionsRouteImport.update({
-  id: '/dashboard/subscriptions',
-  path: '/dashboard/subscriptions',
-  getParentRoute: () => rootRouteImport,
+  id: '/subscriptions',
+  path: '/subscriptions',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardSupportRoute = DashboardSupportRouteImport.update({
-  id: '/dashboard/support',
-  path: '/dashboard/support',
-  getParentRoute: () => rootRouteImport,
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardUsersRoute = DashboardUsersRouteImport.update({
-  id: '/dashboard/users',
-  path: '/dashboard/users',
-  getParentRoute: () => rootRouteImport,
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardOrganisationsIndexRoute =
   DashboardOrganisationsIndexRouteImport.update({
-    id: '/dashboard/organisations/',
-    path: '/dashboard/organisations/',
-    getParentRoute: () => rootRouteImport,
+    id: '/organisations/',
+    path: '/organisations/',
+    getParentRoute: () => DashboardRouteRoute,
   } as any)
 const DashboardOrganisationsAlertsRoute =
   DashboardOrganisationsAlertsRouteImport.update({
-    id: '/dashboard/organisations/alerts',
-    path: '/dashboard/organisations/alerts',
-    getParentRoute: () => rootRouteImport,
+    id: '/organisations/alerts',
+    path: '/organisations/alerts',
+    getParentRoute: () => DashboardRouteRoute,
   } as any)
 const DashboardOrganisationsHostsRoute =
   DashboardOrganisationsHostsRouteImport.update({
-    id: '/dashboard/organisations/hosts',
-    path: '/dashboard/organisations/hosts',
-    getParentRoute: () => rootRouteImport,
+    id: '/organisations/hosts',
+    path: '/organisations/hosts',
+    getParentRoute: () => DashboardRouteRoute,
   } as any)
 const DashboardOrganisationsKycRoute =
   DashboardOrganisationsKycRouteImport.update({
-    id: '/dashboard/organisations/kyc',
-    path: '/dashboard/organisations/kyc',
-    getParentRoute: () => rootRouteImport,
+    id: '/organisations/kyc',
+    path: '/organisations/kyc',
+    getParentRoute: () => DashboardRouteRoute,
   } as any)
 const DashboardOrganisationsTypesRoute =
   DashboardOrganisationsTypesRouteImport.update({
-    id: '/dashboard/organisations/types',
-    path: '/dashboard/organisations/types',
-    getParentRoute: () => rootRouteImport,
+    id: '/organisations/types',
+    path: '/organisations/types',
+    getParentRoute: () => DashboardRouteRoute,
   } as any)
 const DashboardTestIndexRoute = DashboardTestIndexRouteImport.update({
-  id: '/dashboard/test/',
-  path: '/dashboard/test/',
-  getParentRoute: () => rootRouteImport,
+  id: '/test/',
+  path: '/test/',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/dashboard/announcements': typeof DashboardAnnouncementsRoute
   '/dashboard/audit-logs': typeof DashboardAuditLogsRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/dashboard/announcements': typeof DashboardAnnouncementsRoute
   '/dashboard/audit-logs': typeof DashboardAuditLogsRoute
@@ -190,6 +198,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dashboard'
     | '/login'
     | '/dashboard/announcements'
     | '/dashboard/audit-logs'
@@ -230,6 +239,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/dashboard'
     | '/login'
     | '/dashboard/announcements'
     | '/dashboard/audit-logs'
@@ -251,7 +261,149 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/announcements': {
+      id: '/dashboard/announcements'
+      path: '/announcements'
+      fullPath: '/dashboard/announcements'
+      preLoaderRoute: typeof DashboardAnnouncementsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/audit-logs': {
+      id: '/dashboard/audit-logs'
+      path: '/audit-logs'
+      fullPath: '/dashboard/audit-logs'
+      preLoaderRoute: typeof DashboardAuditLogsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/entxit-logs': {
+      id: '/dashboard/entxit-logs'
+      path: '/entxit-logs'
+      fullPath: '/dashboard/entxit-logs'
+      preLoaderRoute: typeof DashboardEntxitLogsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/reports': {
+      id: '/dashboard/reports'
+      path: '/reports'
+      fullPath: '/dashboard/reports'
+      preLoaderRoute: typeof DashboardReportsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/settings': {
+      id: '/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/subscription-plan': {
+      id: '/dashboard/subscription-plan'
+      path: '/subscription-plan'
+      fullPath: '/dashboard/subscription-plan'
+      preLoaderRoute: typeof DashboardSubscriptionPlanRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/subscriptions': {
+      id: '/dashboard/subscriptions'
+      path: '/subscriptions'
+      fullPath: '/dashboard/subscriptions'
+      preLoaderRoute: typeof DashboardSubscriptionsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/support': {
+      id: '/dashboard/support'
+      path: '/support'
+      fullPath: '/dashboard/support'
+      preLoaderRoute: typeof DashboardSupportRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/users': {
+      id: '/dashboard/users'
+      path: '/users'
+      fullPath: '/dashboard/users'
+      preLoaderRoute: typeof DashboardUsersRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/organisations/': {
+      id: '/dashboard/organisations/'
+      path: '/organisations'
+      fullPath: '/dashboard/organisations/'
+      preLoaderRoute: typeof DashboardOrganisationsIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/organisations/alerts': {
+      id: '/dashboard/organisations/alerts'
+      path: '/organisations/alerts'
+      fullPath: '/dashboard/organisations/alerts'
+      preLoaderRoute: typeof DashboardOrganisationsAlertsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/organisations/hosts': {
+      id: '/dashboard/organisations/hosts'
+      path: '/organisations/hosts'
+      fullPath: '/dashboard/organisations/hosts'
+      preLoaderRoute: typeof DashboardOrganisationsHostsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/organisations/kyc': {
+      id: '/dashboard/organisations/kyc'
+      path: '/organisations/kyc'
+      fullPath: '/dashboard/organisations/kyc'
+      preLoaderRoute: typeof DashboardOrganisationsKycRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/organisations/types': {
+      id: '/dashboard/organisations/types'
+      path: '/organisations/types'
+      fullPath: '/dashboard/organisations/types'
+      preLoaderRoute: typeof DashboardOrganisationsTypesRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/test/': {
+      id: '/dashboard/test/'
+      path: '/test'
+      fullPath: '/dashboard/test/'
+      preLoaderRoute: typeof DashboardTestIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+  }
+}
+
+interface DashboardRouteRouteChildren {
   DashboardAnnouncementsRoute: typeof DashboardAnnouncementsRoute
   DashboardAuditLogsRoute: typeof DashboardAuditLogsRoute
   DashboardEntxitLogsRoute: typeof DashboardEntxitLogsRoute
@@ -270,140 +422,7 @@ export interface RootRouteChildren {
   DashboardTestIndexRoute: typeof DashboardTestIndexRoute
 }
 
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/': {
-      id: '/dashboard/'
-      path: '/dashboard'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof DashboardIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/announcements': {
-      id: '/dashboard/announcements'
-      path: '/dashboard/announcements'
-      fullPath: '/dashboard/announcements'
-      preLoaderRoute: typeof DashboardAnnouncementsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/audit-logs': {
-      id: '/dashboard/audit-logs'
-      path: '/dashboard/audit-logs'
-      fullPath: '/dashboard/audit-logs'
-      preLoaderRoute: typeof DashboardAuditLogsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/entxit-logs': {
-      id: '/dashboard/entxit-logs'
-      path: '/dashboard/entxit-logs'
-      fullPath: '/dashboard/entxit-logs'
-      preLoaderRoute: typeof DashboardEntxitLogsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/reports': {
-      id: '/dashboard/reports'
-      path: '/dashboard/reports'
-      fullPath: '/dashboard/reports'
-      preLoaderRoute: typeof DashboardReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/settings': {
-      id: '/dashboard/settings'
-      path: '/dashboard/settings'
-      fullPath: '/dashboard/settings'
-      preLoaderRoute: typeof DashboardSettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/subscription-plan': {
-      id: '/dashboard/subscription-plan'
-      path: '/dashboard/subscription-plan'
-      fullPath: '/dashboard/subscription-plan'
-      preLoaderRoute: typeof DashboardSubscriptionPlanRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/subscriptions': {
-      id: '/dashboard/subscriptions'
-      path: '/dashboard/subscriptions'
-      fullPath: '/dashboard/subscriptions'
-      preLoaderRoute: typeof DashboardSubscriptionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/support': {
-      id: '/dashboard/support'
-      path: '/dashboard/support'
-      fullPath: '/dashboard/support'
-      preLoaderRoute: typeof DashboardSupportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/users': {
-      id: '/dashboard/users'
-      path: '/dashboard/users'
-      fullPath: '/dashboard/users'
-      preLoaderRoute: typeof DashboardUsersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/organisations/': {
-      id: '/dashboard/organisations/'
-      path: '/dashboard/organisations'
-      fullPath: '/dashboard/organisations/'
-      preLoaderRoute: typeof DashboardOrganisationsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/organisations/alerts': {
-      id: '/dashboard/organisations/alerts'
-      path: '/dashboard/organisations/alerts'
-      fullPath: '/dashboard/organisations/alerts'
-      preLoaderRoute: typeof DashboardOrganisationsAlertsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/organisations/hosts': {
-      id: '/dashboard/organisations/hosts'
-      path: '/dashboard/organisations/hosts'
-      fullPath: '/dashboard/organisations/hosts'
-      preLoaderRoute: typeof DashboardOrganisationsHostsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/organisations/kyc': {
-      id: '/dashboard/organisations/kyc'
-      path: '/dashboard/organisations/kyc'
-      fullPath: '/dashboard/organisations/kyc'
-      preLoaderRoute: typeof DashboardOrganisationsKycRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/organisations/types': {
-      id: '/dashboard/organisations/types'
-      path: '/dashboard/organisations/types'
-      fullPath: '/dashboard/organisations/types'
-      preLoaderRoute: typeof DashboardOrganisationsTypesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/test/': {
-      id: '/dashboard/test/'
-      path: '/dashboard/test'
-      fullPath: '/dashboard/test/'
-      preLoaderRoute: typeof DashboardTestIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-  }
-}
-
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  LoginRoute: LoginRoute,
+const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAnnouncementsRoute: DashboardAnnouncementsRoute,
   DashboardAuditLogsRoute: DashboardAuditLogsRoute,
   DashboardEntxitLogsRoute: DashboardEntxitLogsRoute,
@@ -420,6 +439,16 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardOrganisationsTypesRoute: DashboardOrganisationsTypesRoute,
   DashboardOrganisationsIndexRoute: DashboardOrganisationsIndexRoute,
   DashboardTestIndexRoute: DashboardTestIndexRoute,
+}
+
+const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
+  DashboardRouteRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  DashboardRouteRoute: DashboardRouteRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
