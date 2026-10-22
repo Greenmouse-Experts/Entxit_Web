@@ -6,7 +6,9 @@ import {
 } from "@headlessui/react";
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import {
+	BarChart3,
 	Building2,
+	CreditCard,
 	LayoutDashboard,
 	LogOut,
 	Menu,
@@ -26,6 +28,8 @@ const navigation = [
 	{ to: "/community/tenants", label: "Tenants", icon: UsersRound },
 	{ to: "/community/community", label: "Community", icon: Building2 },
 	{ to: "/community/securities", label: "Securities", icon: ShieldCheck },
+	{ to: "/community/subscription", label: "Subscription", icon: CreditCard },
+	{ to: "/community/reports", label: "Reports", icon: BarChart3 },
 ] as const;
 
 interface SidebarContentProps {
@@ -53,7 +57,7 @@ function SidebarContent({
 
 			<nav
 				aria-label="Community navigation"
-				className="flex-1 space-y-1 px-3 py-6"
+				className="flex-1 space-y-1 overflow-y-auto px-3 py-6"
 			>
 				{navigation.map(({ to, label, icon: Icon }) => (
 					<Link

@@ -17,7 +17,9 @@ import { Route as AuthRegisterRouteRouteImport } from './routes/auth/register/ro
 import { Route as AuthVerifyRouteRouteImport } from './routes/auth/verify/route'
 import { Route as CommunityIndexRouteImport } from './routes/community/index'
 import { Route as CommunityCommunityRouteImport } from './routes/community/community'
+import { Route as CommunityReportsRouteImport } from './routes/community/reports'
 import { Route as CommunitySecuritiesRouteImport } from './routes/community/securities'
+import { Route as CommunitySubscriptionRouteImport } from './routes/community/subscription'
 import { Route as CommunityTenantsRouteImport } from './routes/community/tenants'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAnnouncementsRouteImport } from './routes/dashboard/announcements'
@@ -81,9 +83,19 @@ const CommunityCommunityRoute = CommunityCommunityRouteImport.update({
   path: '/community',
   getParentRoute: () => CommunityRouteRoute,
 } as any)
+const CommunityReportsRoute = CommunityReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => CommunityRouteRoute,
+} as any)
 const CommunitySecuritiesRoute = CommunitySecuritiesRouteImport.update({
   id: '/securities',
   path: '/securities',
+  getParentRoute: () => CommunityRouteRoute,
+} as any)
+const CommunitySubscriptionRoute = CommunitySubscriptionRouteImport.update({
+  id: '/subscription',
+  path: '/subscription',
   getParentRoute: () => CommunityRouteRoute,
 } as any)
 const CommunityTenantsRoute = CommunityTenantsRouteImport.update({
@@ -214,7 +226,9 @@ export interface FileRoutesByFullPath {
   '/auth/verify': typeof AuthVerifyRouteRouteWithChildren
   '/dashboard/organisations': typeof DashboardOrganisationsRouteRouteWithChildren
   '/community/community': typeof CommunityCommunityRoute
+  '/community/reports': typeof CommunityReportsRoute
   '/community/securities': typeof CommunitySecuritiesRoute
+  '/community/subscription': typeof CommunitySubscriptionRoute
   '/community/tenants': typeof CommunityTenantsRoute
   '/dashboard/announcements': typeof DashboardAnnouncementsRoute
   '/dashboard/audit-logs': typeof DashboardAuditLogsRoute
@@ -242,7 +256,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/community/community': typeof CommunityCommunityRoute
+  '/community/reports': typeof CommunityReportsRoute
   '/community/securities': typeof CommunitySecuritiesRoute
+  '/community/subscription': typeof CommunitySubscriptionRoute
   '/community/tenants': typeof CommunityTenantsRoute
   '/dashboard/announcements': typeof DashboardAnnouncementsRoute
   '/dashboard/audit-logs': typeof DashboardAuditLogsRoute
@@ -276,7 +292,9 @@ export interface FileRoutesById {
   '/auth/verify': typeof AuthVerifyRouteRouteWithChildren
   '/dashboard/organisations': typeof DashboardOrganisationsRouteRouteWithChildren
   '/community/community': typeof CommunityCommunityRoute
+  '/community/reports': typeof CommunityReportsRoute
   '/community/securities': typeof CommunitySecuritiesRoute
+  '/community/subscription': typeof CommunitySubscriptionRoute
   '/community/tenants': typeof CommunityTenantsRoute
   '/dashboard/announcements': typeof DashboardAnnouncementsRoute
   '/dashboard/audit-logs': typeof DashboardAuditLogsRoute
@@ -311,7 +329,9 @@ export interface FileRouteTypes {
     | '/auth/verify'
     | '/dashboard/organisations'
     | '/community/community'
+    | '/community/reports'
     | '/community/securities'
+    | '/community/subscription'
     | '/community/tenants'
     | '/dashboard/announcements'
     | '/dashboard/audit-logs'
@@ -339,7 +359,9 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/community/community'
+    | '/community/reports'
     | '/community/securities'
+    | '/community/subscription'
     | '/community/tenants'
     | '/dashboard/announcements'
     | '/dashboard/audit-logs'
@@ -372,7 +394,9 @@ export interface FileRouteTypes {
     | '/auth/verify'
     | '/dashboard/organisations'
     | '/community/community'
+    | '/community/reports'
     | '/community/securities'
+    | '/community/subscription'
     | '/community/tenants'
     | '/dashboard/announcements'
     | '/dashboard/audit-logs'
@@ -465,11 +489,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommunityCommunityRouteImport
       parentRoute: typeof CommunityRouteRoute
     }
+    '/community/reports': {
+      id: '/community/reports'
+      path: '/reports'
+      fullPath: '/community/reports'
+      preLoaderRoute: typeof CommunityReportsRouteImport
+      parentRoute: typeof CommunityRouteRoute
+    }
     '/community/securities': {
       id: '/community/securities'
       path: '/securities'
       fullPath: '/community/securities'
       preLoaderRoute: typeof CommunitySecuritiesRouteImport
+      parentRoute: typeof CommunityRouteRoute
+    }
+    '/community/subscription': {
+      id: '/community/subscription'
+      path: '/subscription'
+      fullPath: '/community/subscription'
+      preLoaderRoute: typeof CommunitySubscriptionRouteImport
       parentRoute: typeof CommunityRouteRoute
     }
     '/community/tenants': {
@@ -631,14 +669,18 @@ declare module '@tanstack/react-router' {
 
 interface CommunityRouteRouteChildren {
   CommunityCommunityRoute: typeof CommunityCommunityRoute
+  CommunityReportsRoute: typeof CommunityReportsRoute
   CommunitySecuritiesRoute: typeof CommunitySecuritiesRoute
+  CommunitySubscriptionRoute: typeof CommunitySubscriptionRoute
   CommunityTenantsRoute: typeof CommunityTenantsRoute
   CommunityIndexRoute: typeof CommunityIndexRoute
 }
 
 const CommunityRouteRouteChildren: CommunityRouteRouteChildren = {
   CommunityCommunityRoute: CommunityCommunityRoute,
+  CommunityReportsRoute: CommunityReportsRoute,
   CommunitySecuritiesRoute: CommunitySecuritiesRoute,
+  CommunitySubscriptionRoute: CommunitySubscriptionRoute,
   CommunityTenantsRoute: CommunityTenantsRoute,
   CommunityIndexRoute: CommunityIndexRoute,
 }

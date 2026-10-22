@@ -1,5 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowUpRight, Building2, ShieldCheck, UsersRound } from "lucide-react";
+import {
+	ArrowUpRight,
+	BarChart3,
+	Building2,
+	CreditCard,
+	ShieldCheck,
+	UsersRound,
+} from "lucide-react";
 import { useId } from "react";
 
 export const Route = createFileRoute("/community/")({
@@ -24,6 +31,18 @@ const sections = [
 		title: "Securities",
 		description: "Security personnel and their assignments",
 		icon: ShieldCheck,
+	},
+	{
+		to: "/community/subscription",
+		title: "Subscription",
+		description: "Your plan and billing details",
+		icon: CreditCard,
+	},
+	{
+		to: "/community/reports",
+		title: "Reports",
+		description: "Community activity and insights",
+		icon: BarChart3,
 	},
 ] as const;
 
