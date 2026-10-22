@@ -1,9 +1,8 @@
-import apiClient from "../lib/api-client";
+import apiClient, { refreshAccessToken } from "../lib/api-client";
 import {
 	clear_user,
 	get_user_value,
 	type ProfileData,
-	set_access_token,
 	set_profile_value,
 	set_user_value,
 	type UserData,
@@ -42,30 +41,61 @@ export interface LoginResponse {
 	payload?: AuthPayload;
 }
 
-const handleAuthSuccess = (resData: any): LoginResponse => {
-	const payload: AuthPayload = resData.payload ?? resData;
+const handleAuthSuccess = (
+	resData: ApiResponse<AuthPayload> | LoginResponse,
+): LoginResponse => {
+	const payload: Partial<AuthPayload> =
+		resData.payload ?? (resData as Partial<AuthPayload>);
+	const responseUser = "user" in resData ? resData.user : undefined;
 	const accessToken =
-		payload.access_token ?? resData.accessToken ?? resData.token;
-	const refreshToken = payload.refresh_token ?? resData.refreshToken;
+		payload.access_token ??
+		("accessToken" in resData ? resData.accessToken : undefined) ??
+		("token" in resData ? resData.token : undefined);
+	const refreshToken =
+		payload.refresh_token ??
+		("refreshToken" in resData ? resData.refreshToken : undefined);
 
 	if (!accessToken) {
 		throw new Error("Authentication response did not include an access token");
 	}
+	const id = payload.id ?? responseUser?.id;
+	const email = payload.email ?? responseUser?.email;
+	if (!id || !email) {
+		throw new Error("Authentication response did not include user details");
+	}
 
-	const role = payload.roles?.[0] ?? "admin";
+	const role =
+		payload.roles?.[0] ??
+		responseUser?.role ??
+		(responseUser && "userType" in responseUser
+			? responseUser.userType
+			: undefined) ??
+		"admin";
 	const userObj: UserData = {
-		id: payload.id,
-		email: payload.email,
+		...responseUser,
+		id,
+		email,
 		name:
-			`${payload.firstName ?? ""} ${payload.lastName ?? ""}`.trim() ||
-			payload.email,
-		firstName: payload.firstName,
-		lastName: payload.lastName,
-		phoneNumber: payload.phone,
+			`${payload.firstName ?? responseUser?.firstName ?? ""} ${payload.lastName ?? responseUser?.lastName ?? ""}`.trim() ||
+			responseUser?.name ||
+			email,
+		firstName: payload.firstName ?? responseUser?.firstName,
+		lastName: payload.lastName ?? responseUser?.lastName,
+		phoneNumber:
+			payload.phone ??
+			(responseUser && "phoneNumber" in responseUser
+				? responseUser.phoneNumber
+				: undefined),
 		userType: role,
 		role,
-		permissions: payload.roles ?? [role],
-		isOnboarded: true,
+		permissions: payload.roles ??
+			(responseUser && "permissions" in responseUser
+				? responseUser.permissions
+				: undefined) ?? [role],
+		isOnboarded:
+			responseUser && "isOnboarded" in responseUser
+				? responseUser.isOnboarded
+				: true,
 	};
 
 	set_user_value({
@@ -73,14 +103,16 @@ const handleAuthSuccess = (resData: any): LoginResponse => {
 		refreshToken,
 		user: userObj,
 	});
-	set_profile_value(userObj as ProfileData);
+	const profile = "profile" in resData ? resData.profile : undefined;
+	set_profile_value(profile ?? userObj);
 
 	return {
 		token: accessToken,
 		accessToken,
 		refreshToken,
 		user: userObj,
-		payload,
+		profile,
+		payload: resData.payload,
 	};
 };
 
@@ -196,19 +228,8 @@ export const authService = {
 	 */
 	refreshToken: async (
 		token?: string,
-	): Promise<{ token: string; refreshToken?: string }> => {
-		const currentRefresh = token ?? get_user_value()?.refreshToken;
-		const { data: response } = await apiClient.post<
-			ApiResponse<{ access_token: string; refresh_token?: string }>
-		>("/auth/refresh", { refreshToken: currentRefresh });
-		const newAccessToken =
-			response.payload?.access_token ?? (response as any).token;
-		if (newAccessToken) set_access_token(newAccessToken);
-		return {
-			token: newAccessToken,
-			refreshToken: response.payload?.refresh_token,
-		};
-	},
+	): Promise<{ token: string; refreshToken?: string }> =>
+		refreshAccessToken(token),
 
 	/**
 	 * Logout current session

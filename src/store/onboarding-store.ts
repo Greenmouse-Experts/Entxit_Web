@@ -2,18 +2,11 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export interface OnboardingFormData {
-	industry: string;
-	teamSize: string;
-	logo: string | null;
-	theme: "light" | "dark";
-	companyAddress: string;
-	companyCity: string;
-	companyCountry: string;
-	companyWebsite: string;
-	companyState: string;
-	businessType: string;
-	isCacRegistered: boolean;
-	hearAboutUs: string;
+	facilityType: string;
+	communityAddress: string;
+	communityCity: string;
+	communityCountry: string;
+	communityState: string;
 }
 
 interface OnboardingState {
@@ -27,18 +20,11 @@ interface OnboardingState {
 }
 
 const defaultFormData: OnboardingFormData = {
-	industry: "",
-	teamSize: "1-20",
-	logo: null,
-	theme: "light",
-	companyAddress: "",
-	companyCity: "",
-	companyCountry: "Nigeria",
-	companyWebsite: "",
-	companyState: "",
-	businessType: "",
-	isCacRegistered: false,
-	hearAboutUs: "",
+	facilityType: "",
+	communityAddress: "",
+	communityCity: "",
+	communityCountry: "Nigeria",
+	communityState: "",
 };
 
 export const useOnboardingStore = create<OnboardingState>()(
@@ -46,41 +32,38 @@ export const useOnboardingStore = create<OnboardingState>()(
 		(set) => ({
 			step: 1,
 			formData: { ...defaultFormData },
-			setStep: (step) => set({ step }),
-			nextStep: () => set((state) => ({ step: state.step + 1 })),
+			setStep: (step) => set({ step: Math.min(2, Math.max(1, step)) }),
+			nextStep: () => set((state) => ({ step: Math.min(2, state.step + 1) })),
 			prevStep: () => set((state) => ({ step: Math.max(1, state.step - 1) })),
 			updateFormData: (data) =>
-				set((state) => ({
-					formData: {
-						...state.formData,
-						...data,
-						theme:
-							data.theme === "dark"
-								? "dark"
-								: data.theme === "light"
-									? "light"
-									: state.formData.theme,
-						teamSize: data.teamSize || state.formData.teamSize || "1-20",
-					},
-				})),
-			reset: () =>
-				set({
-					step: 1,
-					formData: { ...defaultFormData },
-				}),
+				set((state) => ({ formData: { ...state.formData, ...data } })),
+			reset: () => set({ step: 1, formData: { ...defaultFormData } }),
 		}),
 		{
 			name: "onboarding-storage",
-			merge: (persistedState: any, currentState) => ({
-				...currentState,
-				...persistedState,
-				formData: {
-					...currentState.formData,
-					...(persistedState?.formData ?? {}),
-					theme: persistedState?.formData?.theme === "dark" ? "dark" : "light",
-					teamSize: persistedState?.formData?.teamSize || "1-20",
-				},
-			}),
+			version: 1,
+			migrate: (persistedState) => {
+				const previous = persistedState as {
+					formData?: Record<string, unknown>;
+				} | null;
+				const data = previous?.formData ?? {};
+				return {
+					step: 1,
+					formData: {
+						...defaultFormData,
+						communityAddress: String(
+							data.communityAddress ?? data.companyAddress ?? "",
+						),
+						communityCity: String(data.communityCity ?? data.companyCity ?? ""),
+						communityCountry: String(
+							data.communityCountry ?? data.companyCountry ?? "Nigeria",
+						),
+						communityState: String(
+							data.communityState ?? data.companyState ?? "",
+						),
+					},
+				};
+			},
 		},
 	),
 );

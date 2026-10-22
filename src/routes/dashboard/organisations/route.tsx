@@ -1,13 +1,13 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/dashboard/organisations")({
-  component: RouteComponent,
+	component: RouteComponent,
 });
 
 function RouteComponent() {
-  return (
-    <>
-      <Outlet />
-    </>
-  );
+	return (
+		<>
+			<Outlet />
+		</>
+	);
 }

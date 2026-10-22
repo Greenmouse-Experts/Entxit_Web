@@ -10,8 +10,15 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CommunityRouteRouteImport } from './routes/community/route'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthRegisterRouteRouteImport } from './routes/auth/register/route'
+import { Route as AuthVerifyRouteRouteImport } from './routes/auth/verify/route'
+import { Route as CommunityIndexRouteImport } from './routes/community/index'
+import { Route as CommunityCommunityRouteImport } from './routes/community/community'
+import { Route as CommunitySecuritiesRouteImport } from './routes/community/securities'
+import { Route as CommunityTenantsRouteImport } from './routes/community/tenants'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAnnouncementsRouteImport } from './routes/dashboard/announcements'
 import { Route as DashboardAuditLogsRouteImport } from './routes/dashboard/audit-logs'
@@ -23,16 +30,25 @@ import { Route as DashboardSubscriptionPlanRouteImport } from './routes/dashboar
 import { Route as DashboardSubscriptionsRouteImport } from './routes/dashboard/subscriptions'
 import { Route as DashboardSupportRouteImport } from './routes/dashboard/support'
 import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
+import { Route as AuthLoginIndexRouteImport } from './routes/auth/login.index'
+import { Route as AuthRegisterIndexRouteImport } from './routes/auth/register/index'
+import { Route as AuthVerifyIndexRouteImport } from './routes/auth/verify/index'
 import { Route as DashboardOrganisationsIndexRouteImport } from './routes/dashboard/organisations/index'
 import { Route as DashboardOrganisationsAlertsRouteImport } from './routes/dashboard/organisations/alerts'
 import { Route as DashboardOrganisationsHostsRouteImport } from './routes/dashboard/organisations/hosts'
 import { Route as DashboardOrganisationsKycRouteImport } from './routes/dashboard/organisations/kyc'
 import { Route as DashboardOrganisationsTypesRouteImport } from './routes/dashboard/organisations/types'
 import { Route as DashboardTestIndexRouteImport } from './routes/dashboard/test.index'
+import { Route as AuthRegisterOnBoardingIndexRouteImport } from './routes/auth/register/on-boarding/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityRouteRoute = CommunityRouteRouteImport.update({
+  id: '/community',
+  path: '/community',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
@@ -44,6 +60,36 @@ const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRegisterRouteRoute = AuthRegisterRouteRouteImport.update({
+  id: '/auth/register',
+  path: '/auth/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthVerifyRouteRoute = AuthVerifyRouteRouteImport.update({
+  id: '/auth/verify',
+  path: '/auth/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityIndexRoute = CommunityIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CommunityRouteRoute,
+} as any)
+const CommunityCommunityRoute = CommunityCommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => CommunityRouteRoute,
+} as any)
+const CommunitySecuritiesRoute = CommunitySecuritiesRouteImport.update({
+  id: '/securities',
+  path: '/securities',
+  getParentRoute: () => CommunityRouteRoute,
+} as any)
+const CommunityTenantsRoute = CommunityTenantsRouteImport.update({
+  id: '/tenants',
+  path: '/tenants',
+  getParentRoute: () => CommunityRouteRoute,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
@@ -102,6 +148,21 @@ const DashboardUsersRoute = DashboardUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const AuthLoginIndexRoute = AuthLoginIndexRouteImport.update({
+  id: '/auth/login/',
+  path: '/auth/login/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRegisterIndexRoute = AuthRegisterIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthRegisterRouteRoute,
+} as any)
+const AuthVerifyIndexRoute = AuthVerifyIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthVerifyRouteRoute,
+} as any)
 const DashboardOrganisationsIndexRoute =
   DashboardOrganisationsIndexRouteImport.update({
     id: '/',
@@ -137,12 +198,24 @@ const DashboardTestIndexRoute = DashboardTestIndexRouteImport.update({
   path: '/test/',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const AuthRegisterOnBoardingIndexRoute =
+  AuthRegisterOnBoardingIndexRouteImport.update({
+    id: '/on-boarding/',
+    path: '/on-boarding/',
+    getParentRoute: () => AuthRegisterRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/community': typeof CommunityRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/auth/register': typeof AuthRegisterRouteRouteWithChildren
+  '/auth/verify': typeof AuthVerifyRouteRouteWithChildren
   '/dashboard/organisations': typeof DashboardOrganisationsRouteRouteWithChildren
+  '/community/community': typeof CommunityCommunityRoute
+  '/community/securities': typeof CommunitySecuritiesRoute
+  '/community/tenants': typeof CommunityTenantsRoute
   '/dashboard/announcements': typeof DashboardAnnouncementsRoute
   '/dashboard/audit-logs': typeof DashboardAuditLogsRoute
   '/dashboard/entxit-logs': typeof DashboardEntxitLogsRoute
@@ -152,17 +225,25 @@ export interface FileRoutesByFullPath {
   '/dashboard/subscriptions': typeof DashboardSubscriptionsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/users': typeof DashboardUsersRoute
+  '/community/': typeof CommunityIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/organisations/alerts': typeof DashboardOrganisationsAlertsRoute
   '/dashboard/organisations/hosts': typeof DashboardOrganisationsHostsRoute
   '/dashboard/organisations/kyc': typeof DashboardOrganisationsKycRoute
   '/dashboard/organisations/types': typeof DashboardOrganisationsTypesRoute
+  '/auth/login/': typeof AuthLoginIndexRoute
+  '/auth/register/': typeof AuthRegisterIndexRoute
+  '/auth/verify/': typeof AuthVerifyIndexRoute
   '/dashboard/organisations/': typeof DashboardOrganisationsIndexRoute
   '/dashboard/test/': typeof DashboardTestIndexRoute
+  '/auth/register/on-boarding/': typeof AuthRegisterOnBoardingIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/community/community': typeof CommunityCommunityRoute
+  '/community/securities': typeof CommunitySecuritiesRoute
+  '/community/tenants': typeof CommunityTenantsRoute
   '/dashboard/announcements': typeof DashboardAnnouncementsRoute
   '/dashboard/audit-logs': typeof DashboardAuditLogsRoute
   '/dashboard/entxit-logs': typeof DashboardEntxitLogsRoute
@@ -172,20 +253,31 @@ export interface FileRoutesByTo {
   '/dashboard/subscriptions': typeof DashboardSubscriptionsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/users': typeof DashboardUsersRoute
+  '/community': typeof CommunityIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/organisations/alerts': typeof DashboardOrganisationsAlertsRoute
   '/dashboard/organisations/hosts': typeof DashboardOrganisationsHostsRoute
   '/dashboard/organisations/kyc': typeof DashboardOrganisationsKycRoute
   '/dashboard/organisations/types': typeof DashboardOrganisationsTypesRoute
+  '/auth/login': typeof AuthLoginIndexRoute
+  '/auth/register': typeof AuthRegisterIndexRoute
+  '/auth/verify': typeof AuthVerifyIndexRoute
   '/dashboard/organisations': typeof DashboardOrganisationsIndexRoute
   '/dashboard/test': typeof DashboardTestIndexRoute
+  '/auth/register/on-boarding': typeof AuthRegisterOnBoardingIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/community': typeof CommunityRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/auth/register': typeof AuthRegisterRouteRouteWithChildren
+  '/auth/verify': typeof AuthVerifyRouteRouteWithChildren
   '/dashboard/organisations': typeof DashboardOrganisationsRouteRouteWithChildren
+  '/community/community': typeof CommunityCommunityRoute
+  '/community/securities': typeof CommunitySecuritiesRoute
+  '/community/tenants': typeof CommunityTenantsRoute
   '/dashboard/announcements': typeof DashboardAnnouncementsRoute
   '/dashboard/audit-logs': typeof DashboardAuditLogsRoute
   '/dashboard/entxit-logs': typeof DashboardEntxitLogsRoute
@@ -195,21 +287,32 @@ export interface FileRoutesById {
   '/dashboard/subscriptions': typeof DashboardSubscriptionsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/users': typeof DashboardUsersRoute
+  '/community/': typeof CommunityIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/organisations/alerts': typeof DashboardOrganisationsAlertsRoute
   '/dashboard/organisations/hosts': typeof DashboardOrganisationsHostsRoute
   '/dashboard/organisations/kyc': typeof DashboardOrganisationsKycRoute
   '/dashboard/organisations/types': typeof DashboardOrganisationsTypesRoute
+  '/auth/login/': typeof AuthLoginIndexRoute
+  '/auth/register/': typeof AuthRegisterIndexRoute
+  '/auth/verify/': typeof AuthVerifyIndexRoute
   '/dashboard/organisations/': typeof DashboardOrganisationsIndexRoute
   '/dashboard/test/': typeof DashboardTestIndexRoute
+  '/auth/register/on-boarding/': typeof AuthRegisterOnBoardingIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/community'
     | '/dashboard'
     | '/login'
+    | '/auth/register'
+    | '/auth/verify'
     | '/dashboard/organisations'
+    | '/community/community'
+    | '/community/securities'
+    | '/community/tenants'
     | '/dashboard/announcements'
     | '/dashboard/audit-logs'
     | '/dashboard/entxit-logs'
@@ -219,17 +322,25 @@ export interface FileRouteTypes {
     | '/dashboard/subscriptions'
     | '/dashboard/support'
     | '/dashboard/users'
+    | '/community/'
     | '/dashboard/'
     | '/dashboard/organisations/alerts'
     | '/dashboard/organisations/hosts'
     | '/dashboard/organisations/kyc'
     | '/dashboard/organisations/types'
+    | '/auth/login/'
+    | '/auth/register/'
+    | '/auth/verify/'
     | '/dashboard/organisations/'
     | '/dashboard/test/'
+    | '/auth/register/on-boarding/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
+    | '/community/community'
+    | '/community/securities'
+    | '/community/tenants'
     | '/dashboard/announcements'
     | '/dashboard/audit-logs'
     | '/dashboard/entxit-logs'
@@ -239,19 +350,30 @@ export interface FileRouteTypes {
     | '/dashboard/subscriptions'
     | '/dashboard/support'
     | '/dashboard/users'
+    | '/community'
     | '/dashboard'
     | '/dashboard/organisations/alerts'
     | '/dashboard/organisations/hosts'
     | '/dashboard/organisations/kyc'
     | '/dashboard/organisations/types'
+    | '/auth/login'
+    | '/auth/register'
+    | '/auth/verify'
     | '/dashboard/organisations'
     | '/dashboard/test'
+    | '/auth/register/on-boarding'
   id:
     | '__root__'
     | '/'
+    | '/community'
     | '/dashboard'
     | '/login'
+    | '/auth/register'
+    | '/auth/verify'
     | '/dashboard/organisations'
+    | '/community/community'
+    | '/community/securities'
+    | '/community/tenants'
     | '/dashboard/announcements'
     | '/dashboard/audit-logs'
     | '/dashboard/entxit-logs'
@@ -261,19 +383,28 @@ export interface FileRouteTypes {
     | '/dashboard/subscriptions'
     | '/dashboard/support'
     | '/dashboard/users'
+    | '/community/'
     | '/dashboard/'
     | '/dashboard/organisations/alerts'
     | '/dashboard/organisations/hosts'
     | '/dashboard/organisations/kyc'
     | '/dashboard/organisations/types'
+    | '/auth/login/'
+    | '/auth/register/'
+    | '/auth/verify/'
     | '/dashboard/organisations/'
     | '/dashboard/test/'
+    | '/auth/register/on-boarding/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CommunityRouteRoute: typeof CommunityRouteRouteWithChildren
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
+  AuthRegisterRouteRoute: typeof AuthRegisterRouteRouteWithChildren
+  AuthVerifyRouteRoute: typeof AuthVerifyRouteRouteWithChildren
+  AuthLoginIndexRoute: typeof AuthLoginIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -283,6 +414,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -298,6 +436,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/auth/register': {
+      id: '/auth/register'
+      path: '/auth/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof AuthRegisterRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/verify': {
+      id: '/auth/verify'
+      path: '/auth/verify'
+      fullPath: '/auth/verify'
+      preLoaderRoute: typeof AuthVerifyRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community/': {
+      id: '/community/'
+      path: '/'
+      fullPath: '/community/'
+      preLoaderRoute: typeof CommunityIndexRouteImport
+      parentRoute: typeof CommunityRouteRoute
+    }
+    '/community/community': {
+      id: '/community/community'
+      path: '/community'
+      fullPath: '/community/community'
+      preLoaderRoute: typeof CommunityCommunityRouteImport
+      parentRoute: typeof CommunityRouteRoute
+    }
+    '/community/securities': {
+      id: '/community/securities'
+      path: '/securities'
+      fullPath: '/community/securities'
+      preLoaderRoute: typeof CommunitySecuritiesRouteImport
+      parentRoute: typeof CommunityRouteRoute
+    }
+    '/community/tenants': {
+      id: '/community/tenants'
+      path: '/tenants'
+      fullPath: '/community/tenants'
+      preLoaderRoute: typeof CommunityTenantsRouteImport
+      parentRoute: typeof CommunityRouteRoute
     }
     '/dashboard/': {
       id: '/dashboard/'
@@ -376,6 +556,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardUsersRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/auth/login/': {
+      id: '/auth/login/'
+      path: '/auth/login'
+      fullPath: '/auth/login/'
+      preLoaderRoute: typeof AuthLoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/register/': {
+      id: '/auth/register/'
+      path: '/'
+      fullPath: '/auth/register/'
+      preLoaderRoute: typeof AuthRegisterIndexRouteImport
+      parentRoute: typeof AuthRegisterRouteRoute
+    }
+    '/auth/verify/': {
+      id: '/auth/verify/'
+      path: '/'
+      fullPath: '/auth/verify/'
+      preLoaderRoute: typeof AuthVerifyIndexRouteImport
+      parentRoute: typeof AuthVerifyRouteRoute
+    }
     '/dashboard/organisations/': {
       id: '/dashboard/organisations/'
       path: '/'
@@ -418,8 +619,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTestIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/auth/register/on-boarding/': {
+      id: '/auth/register/on-boarding/'
+      path: '/on-boarding'
+      fullPath: '/auth/register/on-boarding/'
+      preLoaderRoute: typeof AuthRegisterOnBoardingIndexRouteImport
+      parentRoute: typeof AuthRegisterRouteRoute
+    }
   }
 }
+
+interface CommunityRouteRouteChildren {
+  CommunityCommunityRoute: typeof CommunityCommunityRoute
+  CommunitySecuritiesRoute: typeof CommunitySecuritiesRoute
+  CommunityTenantsRoute: typeof CommunityTenantsRoute
+  CommunityIndexRoute: typeof CommunityIndexRoute
+}
+
+const CommunityRouteRouteChildren: CommunityRouteRouteChildren = {
+  CommunityCommunityRoute: CommunityCommunityRoute,
+  CommunitySecuritiesRoute: CommunitySecuritiesRoute,
+  CommunityTenantsRoute: CommunityTenantsRoute,
+  CommunityIndexRoute: CommunityIndexRoute,
+}
+
+const CommunityRouteRouteWithChildren = CommunityRouteRoute._addFileChildren(
+  CommunityRouteRouteChildren,
+)
 
 interface DashboardOrganisationsRouteRouteChildren {
   DashboardOrganisationsAlertsRoute: typeof DashboardOrganisationsAlertsRoute
@@ -478,10 +704,39 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
   DashboardRouteRouteChildren,
 )
 
+interface AuthRegisterRouteRouteChildren {
+  AuthRegisterIndexRoute: typeof AuthRegisterIndexRoute
+  AuthRegisterOnBoardingIndexRoute: typeof AuthRegisterOnBoardingIndexRoute
+}
+
+const AuthRegisterRouteRouteChildren: AuthRegisterRouteRouteChildren = {
+  AuthRegisterIndexRoute: AuthRegisterIndexRoute,
+  AuthRegisterOnBoardingIndexRoute: AuthRegisterOnBoardingIndexRoute,
+}
+
+const AuthRegisterRouteRouteWithChildren =
+  AuthRegisterRouteRoute._addFileChildren(AuthRegisterRouteRouteChildren)
+
+interface AuthVerifyRouteRouteChildren {
+  AuthVerifyIndexRoute: typeof AuthVerifyIndexRoute
+}
+
+const AuthVerifyRouteRouteChildren: AuthVerifyRouteRouteChildren = {
+  AuthVerifyIndexRoute: AuthVerifyIndexRoute,
+}
+
+const AuthVerifyRouteRouteWithChildren = AuthVerifyRouteRoute._addFileChildren(
+  AuthVerifyRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CommunityRouteRoute: CommunityRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   LoginRoute: LoginRoute,
+  AuthRegisterRouteRoute: AuthRegisterRouteRouteWithChildren,
+  AuthVerifyRouteRoute: AuthVerifyRouteRouteWithChildren,
+  AuthLoginIndexRoute: AuthLoginIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
