@@ -141,7 +141,6 @@ function CommunitiesPage() {
 		{
 			key: "hosts",
 			label: "Hosts",
-			disabled: (community) => !community.id,
 			action: (_, navigateTo) =>
 				navigateTo({ to: "/dashboard/organisations/hosts" }),
 		},
@@ -150,8 +149,7 @@ function CommunitiesPage() {
 			label: "Change status",
 			render: (community) =>
 				community.communityStatus === "active" ? "Disable" : "Enable",
-			disabled: (community) => !community.id,
-			disable_event: () => changeStatus.isPending,
+			disable_event: (community) => !community.id || changeStatus.isPending,
 			action: (community) =>
 				act(
 					community,
@@ -161,8 +159,7 @@ function CommunitiesPage() {
 		{
 			key: "delete",
 			label: "Delete",
-			disabled: (community) => !community.id,
-			disable_event: () => changeStatus.isPending,
+			disable_event: (community) => !community.id || changeStatus.isPending,
 			action: (community) => act(community, "delete"),
 		},
 	];
