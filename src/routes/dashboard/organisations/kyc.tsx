@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useDeferredValue, useId, useState } from "react";
 import { toast } from "sonner";
-import { ListFeedback } from "@/components/organisations/ListFeedback";
+import PageLoader from "@/components/layout/PageLoader";
 import { OrganisationShell } from "@/components/organisations/OrganisationShell";
 import CustomTable, { type columnType } from "@/components/tables/CustomTable";
 import { pageSizeParam, positiveInt, textParam } from "@/lib/url-search";
@@ -81,14 +81,6 @@ function KycPage() {
 		},
 		onError: () => toast.error("Could not review this submission"),
 	});
-	const submissions = query.data?.payload?.data ?? [];
-	const meta = query.data?.payload;
-	const totalCount =
-		meta?.pagination?.total ?? meta?.total ?? submissions.length;
-	const totalPages =
-		meta?.pagination?.pages ??
-		meta?.pages ??
-		Math.max(1, Math.ceil(totalCount / pageSize));
 	const columns: columnType<KycSubmission>[] = [
 		{
 			key: "userName",
@@ -232,33 +224,37 @@ function KycPage() {
 					/>
 				</label>
 			</div>
-			<ListFeedback
-				loading={query.isLoading}
-				error={query.isError}
-				empty={false}
-			>
-				<CustomTable
-					data={submissions}
-					columns={columns}
-					caption="KYC submissions"
-					totalCount={totalCount}
-					emptyMessage="No KYC submissions match these filters."
-					paginationProps={{
-						page,
-						pageSize,
-						totalPages,
-						setPagination: (nextPage, nextSize) =>
-							navigate({
-								search: (prev) => ({
-									...prev,
-									page: nextPage,
-									pageSize: nextSize ?? prev.pageSize,
+			<PageLoader query={query}>
+				{(data) => (
+					<CustomTable
+						data={data.payload?.data ?? []}
+						columns={columns}
+						caption="KYC submissions"
+						totalCount={
+							data.payload?.pagination?.total ??
+							data.payload?.total ??
+							data.payload?.data?.length ??
+							0
+						}
+						emptyMessage="No KYC submissions match these filters."
+						paginationProps={{
+							page,
+							pageSize,
+							totalPages:
+								data.payload?.pagination?.pages ?? data.payload?.pages,
+							setPagination: (nextPage, nextSize) =>
+								navigate({
+									search: (prev) => ({
+										...prev,
+										page: nextPage,
+										pageSize: nextSize ?? prev.pageSize,
+									}),
+									replace: true,
 								}),
-								replace: true,
-							}),
-					}}
-				/>
-			</ListFeedback>
+						}}
+					/>
+				)}
+			</PageLoader>
 			{selected && (
 				<div className="modal modal-open" role="presentation">
 					<div

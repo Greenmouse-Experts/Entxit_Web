@@ -41,13 +41,14 @@ export default function CustomTable<T extends object>({
 	caption,
 	emptyMessage = "No records match this view.",
 	ring = true,
-	totalCount = data.length,
+	totalCount: suppliedTotalCount,
 	paginationProps,
 	cursorPaginationProps,
 	onRowClick,
 	rowKey,
 }: CustomTableProps<T>) {
 	const [selectedItem, setSelectedItem] = useState<number | null>(null);
+	const totalCount = suppliedTotalCount ?? data.length;
 	const page = paginationProps?.page ?? 1;
 	const pageSize = paginationProps?.pageSize ?? 10;
 	const totalPages =
@@ -164,9 +165,9 @@ export default function CustomTable<T extends object>({
 							{totalCount}
 						</strong>
 					</p>
-					<div className="flex flex-wrap items-center gap-2">
+					<div className="flex flex-wrap items-center gap-2 bg">
 						<label className="flex items-center gap-2 text-sm text-base-content/65">
-							Rows per page{" "}
+							<span className="whitespace-nowrap"> Rows per page</span>{" "}
 							<select
 								className="select select-bordered select-sm"
 								value={pageSize}
@@ -208,7 +209,7 @@ export default function CustomTable<T extends object>({
 			{cursorPaginationProps && (
 				<CursorPagination
 					{...cursorPaginationProps}
-					totalCount={totalCount ?? cursorPaginationProps.totalCount}
+					totalCount={suppliedTotalCount ?? cursorPaginationProps.totalCount}
 				/>
 			)}
 		</div>

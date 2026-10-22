@@ -1,4 +1,7 @@
-import type { QueryObserverResult } from "@tanstack/react-query";
+import type {
+	QueryObserverResult,
+	UseQueryResult,
+} from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import {
 	AlertCircle,
@@ -7,6 +10,7 @@ import {
 	RefreshCcw,
 	ShieldOff,
 } from "lucide-react";
+import type React from "react";
 import { extract_message } from "@/lib/api-error";
 import type { ApiResponse } from "@/services/types/common.types";
 
@@ -19,11 +23,37 @@ interface EmptyStateConfig {
 
 interface PageLoaderProps<TData> {
 	children?: React.ReactNode | ((data: TData) => React.ReactNode);
-	query: QueryObserverResult<TData>;
+	query: QueryObserverResult<TData, any> | UseQueryResult<TData, any>;
 	customLoading?: React.ReactNode;
 	loadingText?: string;
 	showSuccessState?: boolean;
 	emptyState?: EmptyStateConfig;
+}
+
+function isResponseEmpty(data: unknown): boolean {
+	if (data === null || data === undefined) return true;
+	if (Array.isArray(data)) return data.length === 0;
+
+	if (typeof data === "object") {
+		// Handle ApiResponse envelope: { payload: [...] } or { payload: { data: [...] } }
+		if ("payload" in data) {
+			const payload = (data as { payload: unknown }).payload;
+			if (payload === null || payload === undefined) return true;
+			if (Array.isArray(payload)) return payload.length === 0;
+			if (typeof payload === "object" && "data" in payload) {
+				const nested = (payload as { data: unknown }).data;
+				if (Array.isArray(nested)) return nested.length === 0;
+			}
+		}
+
+		// Handle direct { data: [...] } structure
+		if ("data" in data) {
+			const nested = (data as { data: unknown }).data;
+			if (Array.isArray(nested)) return nested.length === 0;
+		}
+	}
+
+	return false;
 }
 
 export default function PageLoader<TData>(props: PageLoaderProps<TData>) {
@@ -37,7 +67,7 @@ export default function PageLoader<TData>(props: PageLoaderProps<TData>) {
 
 	if (query.isLoading) {
 		if (customLoading) {
-			return customLoading;
+			return <>{customLoading}</>;
 		}
 		return (
 			<div className="min-h-[60vh] w-full flex flex-col items-center justify-center p-8 motion-safe:animate-[entxit-fade-in_.7s_ease-out]">
@@ -63,8 +93,11 @@ export default function PageLoader<TData>(props: PageLoaderProps<TData>) {
 	}
 
 	if (query.isError) {
-		const is403 =
-			(query.error as AxiosError<ApiResponse>)?.response?.status === 403;
+		const axiosErr = query.error as AxiosError<ApiResponse> | undefined;
+		const status =
+			axiosErr?.response?.status ??
+			(query.error as { status?: number })?.status;
+		const is403 = status === 403 || status === 401;
 
 		if (is403) {
 			return (
@@ -76,8 +109,8 @@ export default function PageLoader<TData>(props: PageLoaderProps<TData>) {
 						Access Denied
 					</h3>
 					<p className="mt-1 text-sm text-base-content/60 max-w-xs">
-						You don't have permission to view this resource. Contact support or
-						a Super Admin to request access.
+						{extract_message(query.error) ||
+							"You don't have permission to view this resource. Contact support or a Super Admin to request access."}
 					</p>
 				</div>
 			);
@@ -92,7 +125,7 @@ export default function PageLoader<TData>(props: PageLoaderProps<TData>) {
 					Something went wrong
 				</h3>
 				<p className="mt-1 text-sm text-base-content/60 max-w-xs">
-					{extract_message(query.error as AxiosError<ApiResponse>)}
+					{extract_message(query.error)}
 				</p>
 				<button
 					type="button"
@@ -106,9 +139,36 @@ export default function PageLoader<TData>(props: PageLoaderProps<TData>) {
 		);
 	}
 
-	if (!query.data) return null;
+	if (query.data === undefined || query.data === null) {
+		if (emptyState) {
+			return (
+				<div className="min-h-[40vh] w-full flex flex-col items-center justify-center p-6 text-center motion-safe:animate-[entxit-zoom-in_.3s_ease-out] bg-base-100 rounded-2xl border border-base-200">
+					<div className="mb-4 rounded-full bg-base-200 p-4 text-base-content/40">
+						<Inbox className="h-8 w-8" />
+					</div>
+					<h3 className="text-lg font-semibold text-base-content">
+						{emptyState.title ?? "No Records Found"}
+					</h3>
+					<p className="mt-1 text-sm text-base-content/60 max-w-sm">
+						{emptyState.description ??
+							"There are currently no items available in this view."}
+					</p>
+					{emptyState.actionText && emptyState.onAction && (
+						<button
+							type="button"
+							onClick={emptyState.onAction}
+							className="mt-5 btn btn-primary btn-sm"
+						>
+							{emptyState.actionText}
+						</button>
+					)}
+				</div>
+			);
+		}
+		return null;
+	}
 
-	if (Array.isArray(query.data) && query.data.length === 0 && emptyState) {
+	if (emptyState && isResponseEmpty(query.data)) {
 		return (
 			<div className="min-h-[40vh] w-full flex flex-col items-center justify-center p-6 text-center motion-safe:animate-[entxit-zoom-in_.3s_ease-out] bg-base-100 rounded-2xl border border-base-200">
 				<div className="mb-4 rounded-full bg-base-200 p-4 text-base-content/40">

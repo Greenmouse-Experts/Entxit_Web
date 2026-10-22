@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Building2, Search, ShieldCheck, UsersRound } from "lucide-react";
 import { useDeferredValue } from "react";
 import { toast } from "sonner";
-import { ListFeedback } from "@/components/organisations/ListFeedback";
+import PageLoader from "@/components/layout/PageLoader";
+import QueryCompLayout from "@/components/layout/QueryCompLayout";
 import { OrganisationShell } from "@/components/organisations/OrganisationShell";
 import CustomTable, { type columnType } from "@/components/tables/CustomTable";
+import type { Actions } from "@/components/tables/pop-up";
 import { pageSizeParam, positiveInt, textParam } from "@/lib/url-search";
 import { adminService } from "@/services/admin.service";
 import type { HostCommunitySummary } from "@/services/types";
@@ -68,14 +70,6 @@ function CommunitiesPage() {
 		},
 		onError: () => toast.error("Could not update the community"),
 	});
-	const rows = communitiesQuery.data?.payload?.data ?? [];
-	const meta = communitiesQuery.data?.payload;
-	const totalCount = meta?.pagination?.total ?? meta?.total ?? rows.length;
-	const totalPages =
-		meta?.pagination?.pages ??
-		meta?.pages ??
-		Math.max(1, Math.ceil(totalCount / pageSize));
-	const stats = statsQuery.data?.payload;
 
 	function act(
 		community: HostCommunitySummary,
@@ -141,43 +135,35 @@ function CommunitiesPage() {
 				</span>
 			),
 		},
+	];
+
+	const actions: Actions<HostCommunitySummary>[] = [
 		{
-			key: "action",
-			label: "Actions",
-			className: "text-right",
-			render: (_, community) => (
-				<div className="flex justify-end gap-2">
-					{community.id && (
-						<Link
-							className="btn btn-ghost btn-xs"
-							to="/dashboard/organisations/hosts"
-						>
-							Hosts
-						</Link>
-					)}
-					<button
-						type="button"
-						className="btn btn-outline btn-xs"
-						disabled={!community.id || changeStatus.isPending}
-						onClick={() =>
-							act(
-								community,
-								community.communityStatus === "active" ? "disable" : "enable",
-							)
-						}
-					>
-						{community.communityStatus === "active" ? "Disable" : "Enable"}
-					</button>
-					<button
-						type="button"
-						className="btn btn-ghost btn-xs text-error"
-						disabled={!community.id || changeStatus.isPending}
-						onClick={() => act(community, "delete")}
-					>
-						Delete
-					</button>
-				</div>
-			),
+			key: "hosts",
+			label: "Hosts",
+			disabled: (community) => !community.id,
+			action: (_, navigateTo) =>
+				navigateTo({ to: "/dashboard/organisations/hosts" }),
+		},
+		{
+			key: "toggle-status",
+			label: "Change status",
+			render: (community) =>
+				community.communityStatus === "active" ? "Disable" : "Enable",
+			disabled: (community) => !community.id,
+			disable_event: () => changeStatus.isPending,
+			action: (community) =>
+				act(
+					community,
+					community.communityStatus === "active" ? "disable" : "enable",
+				),
+		},
+		{
+			key: "delete",
+			label: "Delete",
+			disabled: (community) => !community.id,
+			disable_event: () => changeStatus.isPending,
+			action: (community) => act(community, "delete"),
 		},
 	];
 
@@ -186,35 +172,47 @@ function CommunitiesPage() {
 			title="Communities"
 			description="Monitor host communities, their membership, and account status."
 		>
-			<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-				{[
-					{
-						label: "Total communities",
-						value: stats?.totalCommunities,
-						icon: Building2,
-					},
-					{
-						label: "Active communities",
-						value: stats?.activeCommunities,
-						icon: ShieldCheck,
-					},
-					{ label: "Members", value: stats?.totalMembers, icon: UsersRound },
-					{ label: "Guards", value: stats?.totalGuards, icon: ShieldCheck },
-				].map(({ label, value, icon: Icon }) => (
-					<div
-						key={label}
-						className="rounded-box border border-base-300 bg-base-100 p-5 shadow-sm"
-					>
-						<div className="flex items-center justify-between text-sm text-base-content/65">
-							<span>{label}</span>
-							<Icon aria-hidden="true" className="size-5 text-primary" />
-						</div>
-						<p className="mt-3 text-3xl font-semibold tabular-nums text-base-content">
-							{statsQuery.isLoading ? "…" : (value ?? "—").toLocaleString()}
-						</p>
+			<QueryCompLayout query={statsQuery}>
+				{(stats) => (
+					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+						{[
+							{
+								label: "Total communities",
+								value: stats.payload?.totalCommunities,
+								icon: Building2,
+							},
+							{
+								label: "Active communities",
+								value: stats.payload?.activeCommunities,
+								icon: ShieldCheck,
+							},
+							{
+								label: "Members",
+								value: stats.payload?.totalMembers,
+								icon: UsersRound,
+							},
+							{
+								label: "Guards",
+								value: stats.payload?.totalGuards,
+								icon: ShieldCheck,
+							},
+						].map(({ label, value, icon: Icon }) => (
+							<div
+								key={label}
+								className="rounded-box border border-base-300 bg-base-100 p-5 shadow-sm"
+							>
+								<div className="flex items-center justify-between text-sm text-base-content/65">
+									<span>{label}</span>
+									<Icon aria-hidden="true" className="size-5 text-primary" />
+								</div>
+								<p className="mt-3 text-3xl font-semibold tabular-nums text-base-content">
+									{(value ?? "—").toLocaleString()}
+								</p>
+							</div>
+						))}
 					</div>
-				))}
-			</div>
+				)}
+			</QueryCompLayout>
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
 					<h2 className="font-semibold">All communities</h2>
@@ -242,33 +240,38 @@ function CommunitiesPage() {
 					/>
 				</label>
 			</div>
-			<ListFeedback
-				loading={communitiesQuery.isLoading}
-				error={communitiesQuery.isError}
-				empty={false}
-			>
-				<CustomTable
-					data={rows}
-					columns={columns}
-					caption="Communities"
-					totalCount={totalCount}
-					emptyMessage="No communities match this search."
-					paginationProps={{
-						page,
-						pageSize,
-						totalPages,
-						setPagination: (nextPage, nextSize) =>
-							navigate({
-								search: (prev) => ({
-									...prev,
-									page: nextPage,
-									pageSize: nextSize ?? prev.pageSize,
+			<PageLoader query={communitiesQuery}>
+				{(data) => (
+					<CustomTable
+						data={data.payload?.data ?? []}
+						columns={columns}
+						actions={actions}
+						caption="Communities"
+						totalCount={
+							data.payload?.pagination?.total ??
+							data.payload?.total ??
+							data.payload?.data?.length ??
+							0
+						}
+						emptyMessage="No communities match this search."
+						paginationProps={{
+							page,
+							pageSize,
+							totalPages:
+								data.payload?.pagination?.pages ?? data.payload?.pages,
+							setPagination: (nextPage, nextSize) =>
+								navigate({
+									search: (prev) => ({
+										...prev,
+										page: nextPage,
+										pageSize: nextSize ?? prev.pageSize,
+									}),
+									replace: true,
 								}),
-								replace: true,
-							}),
-					}}
-				/>
-			</ListFeedback>
+						}}
+					/>
+				)}
+			</PageLoader>
 		</OrganisationShell>
 	);
 }

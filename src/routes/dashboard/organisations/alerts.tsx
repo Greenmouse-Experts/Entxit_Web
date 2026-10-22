@@ -2,7 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useId } from "react";
 import { toast } from "sonner";
-import { ListFeedback } from "@/components/organisations/ListFeedback";
+import PageLoader from "@/components/layout/PageLoader";
+import QueryCompLayout from "@/components/layout/QueryCompLayout";
 import { OrganisationShell } from "@/components/organisations/OrganisationShell";
 import CustomTable, { type columnType } from "@/components/tables/CustomTable";
 import { pageSizeParam, positiveInt, textParam } from "@/lib/url-search";
@@ -46,13 +47,6 @@ function SecurityAlertsPage() {
 		},
 		onError: () => toast.error("Could not update the alert"),
 	});
-	const alerts = alertsQuery.data?.payload?.data ?? [];
-	const meta = alertsQuery.data?.payload;
-	const totalCount = meta?.pagination?.total ?? meta?.total ?? alerts.length;
-	const totalPages =
-		meta?.pagination?.pages ??
-		meta?.pages ??
-		Math.max(1, Math.ceil(totalCount / pageSize));
 	const columns: columnType<SecurityAlert>[] = [
 		{
 			key: "title",
@@ -128,65 +122,68 @@ function SecurityAlertsPage() {
 				>
 					Community
 				</label>
-				<select
-					id={communityInputId}
-					className="select select-bordered w-full max-w-sm"
-					value={communityId}
-					onChange={(event) =>
-						navigate({
-							search: (prev) => ({
-								...prev,
-								communityId: event.target.value || undefined,
-								page: 1,
-							}),
-							replace: true,
-						})
-					}
-				>
-					<option value="">Select a community</option>
-					{communitiesQuery.data?.payload?.data?.map(
-						(community) =>
-							community.id && (
-								<option key={community.id} value={community.id}>
-									{community.hostCommunityName}
-								</option>
-							),
-					)}
-				</select>
-				{communitiesQuery.isError && (
-					<p role="alert" className="mt-2 text-sm text-error">
-						Could not load communities.
-					</p>
-				)}
-			</div>
-			{communityId ? (
-				<ListFeedback
-					loading={alertsQuery.isLoading}
-					error={alertsQuery.isError}
-					empty={false}
-				>
-					<CustomTable
-						data={alerts}
-						columns={columns}
-						caption="Security alerts"
-						totalCount={totalCount}
-						emptyMessage="No security alerts for this community."
-						paginationProps={{
-							page,
-							pageSize,
-							totalPages,
-							setPagination: (nextPage, nextSize) =>
+				<QueryCompLayout query={communitiesQuery}>
+					{(data) => (
+						<select
+							id={communityInputId}
+							className="select select-bordered w-full max-w-sm"
+							value={communityId}
+							onChange={(event) =>
 								navigate({
 									search: (prev) => ({
 										...prev,
-										page: nextPage,
-										pageSize: nextSize ?? prev.pageSize,
+										communityId: event.target.value || undefined,
+										page: 1,
 									}),
 									replace: true,
-								}),
-						}}
-					/>
-				</ListFeedback>
+								})
+							}
+						>
+							<option value="">Select a community</option>
+							{data.payload?.data?.map(
+								(community) =>
+									community.id && (
+										<option key={community.id} value={community.id}>
+											{community.hostCommunityName}
+										</option>
+									),
+							)}
+						</select>
+					)}
+				</QueryCompLayout>
+			</div>
+			{communityId ? (
+				<PageLoader query={alertsQuery}>
+					{(data) => (
+						<CustomTable
+							data={data.payload?.data ?? []}
+							columns={columns}
+							caption="Security alerts"
+							totalCount={
+								data.payload?.pagination?.total ??
+								data.payload?.total ??
+								data.payload?.data?.length ??
+								0
+							}
+							emptyMessage="No security alerts for this community."
+							paginationProps={{
+								page,
+								pageSize,
+								totalPages:
+									data.payload?.pagination?.pages ?? data.payload?.pages,
+								setPagination: (nextPage, nextSize) =>
+									navigate({
+										search: (prev) => ({
+											...prev,
+											page: nextPage,
+											pageSize: nextSize ?? prev.pageSize,
+										}),
+										replace: true,
+									}),
+							}}
+						/>
+					)}
+				</PageLoader>
 			) : (
 				<div className="rounded-box border border-dashed border-base-300 bg-base-100 px-6 py-12 text-center text-sm text-base-content/60">
 					Choose a community to load its security alerts.

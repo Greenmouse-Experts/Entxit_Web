@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ListFeedback } from "./ListFeedback";
+import QueryCompLayout from "@/components/layout/QueryCompLayout";
 
 interface NamedType {
 	id: string;
@@ -44,7 +44,6 @@ export function ManagedTypePanel({
 		},
 		onError: () => toast.error("Could not delete type"),
 	});
-	const types = query.data ?? [];
 	return (
 		<section className="rounded-box border border-base-300 bg-base-100 p-5 shadow-sm">
 			<h2 className="text-lg font-semibold">{title}</h2>
@@ -74,32 +73,36 @@ export function ManagedTypePanel({
 				</button>
 			</form>
 			<div className="mt-4 divide-y divide-base-200">
-				<ListFeedback
-					loading={query.isLoading}
-					error={query.isError}
-					empty={types.length === 0}
-				>
-					{types.map((type) => (
-						<div
-							key={type.id}
-							className="flex items-center justify-between gap-3 py-3"
-						>
-							<span className="font-medium">{type.name}</span>
-							<button
-								type="button"
-								className="btn btn-ghost btn-sm text-error"
-								aria-label={`Delete ${type.name}`}
-								disabled={deleteMutation.isPending}
-								onClick={() => {
-									if (window.confirm(`Delete ${type.name}?`))
-										deleteMutation.mutate(type.id);
-								}}
-							>
-								<Trash2 aria-hidden="true" className="size-4" />
-							</button>
-						</div>
-					))}
-				</ListFeedback>
+				<QueryCompLayout query={query}>
+					{(types) =>
+						types.length === 0 ? (
+							<p className="py-8 text-center text-sm text-base-content/60">
+								No types have been added yet.
+							</p>
+						) : (
+							types.map((type) => (
+								<div
+									key={type.id}
+									className="flex items-center justify-between gap-3 py-3"
+								>
+									<span className="font-medium">{type.name}</span>
+									<button
+										type="button"
+										className="btn btn-ghost btn-sm text-error"
+										aria-label={`Delete ${type.name}`}
+										disabled={deleteMutation.isPending}
+										onClick={() => {
+											if (window.confirm(`Delete ${type.name}?`))
+												deleteMutation.mutate(type.id);
+										}}
+									>
+										<Trash2 aria-hidden="true" className="size-4" />
+									</button>
+								</div>
+							))
+						)
+					}
+				</QueryCompLayout>
 			</div>
 		</section>
 	);

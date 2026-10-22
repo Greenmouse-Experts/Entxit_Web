@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useDeferredValue } from "react";
-import { ListFeedback } from "@/components/organisations/ListFeedback";
+import PageLoader from "@/components/layout/PageLoader";
 import { OrganisationShell } from "@/components/organisations/OrganisationShell";
 import CustomTable, { type columnType } from "@/components/tables/CustomTable";
 import { pageSizeParam, positiveInt, textParam } from "@/lib/url-search";
@@ -33,13 +33,6 @@ function HostsPage() {
 				search: deferredQuery || undefined,
 			}),
 	});
-	const hosts = query.data?.payload?.data ?? [];
-	const meta = query.data?.payload;
-	const totalCount = meta?.pagination?.total ?? meta?.total ?? hosts.length;
-	const totalPages =
-		meta?.pagination?.pages ??
-		meta?.pages ??
-		Math.max(1, Math.ceil(totalCount / pageSize));
 	const columns: columnType<HostCommunityHost>[] = [
 		{
 			key: "firstName",
@@ -115,33 +108,37 @@ function HostsPage() {
 					/>
 				</label>
 			</div>
-			<ListFeedback
-				loading={query.isLoading}
-				error={query.isError}
-				empty={false}
-			>
-				<CustomTable
-					data={hosts}
-					columns={columns}
-					caption="Community hosts"
-					totalCount={totalCount}
-					emptyMessage="No hosts match this search."
-					paginationProps={{
-						page,
-						pageSize,
-						totalPages,
-						setPagination: (nextPage, nextSize) =>
-							navigate({
-								search: (prev) => ({
-									...prev,
-									page: nextPage,
-									pageSize: nextSize ?? prev.pageSize,
+			<PageLoader query={query}>
+				{(data) => (
+					<CustomTable
+						data={data.payload?.data ?? []}
+						columns={columns}
+						caption="Community hosts"
+						totalCount={
+							data.payload?.pagination?.total ??
+							data.payload?.total ??
+							data.payload?.data?.length ??
+							0
+						}
+						emptyMessage="No hosts match this search."
+						paginationProps={{
+							page,
+							pageSize,
+							totalPages:
+								data.payload?.pagination?.pages ?? data.payload?.pages,
+							setPagination: (nextPage, nextSize) =>
+								navigate({
+									search: (prev) => ({
+										...prev,
+										page: nextPage,
+										pageSize: nextSize ?? prev.pageSize,
+									}),
+									replace: true,
 								}),
-								replace: true,
-							}),
-					}}
-				/>
-			</ListFeedback>
+						}}
+					/>
+				)}
+			</PageLoader>
 		</OrganisationShell>
 	);
 }

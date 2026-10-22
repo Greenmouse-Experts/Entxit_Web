@@ -1,310 +1,274 @@
-Welcome to your new TanStack app! 
+# EntXit Web
 
-# Getting Started
+EntXit Web is the modern estate, community, and access management web portal built for administrators, security personnel, facility managers, and residents. It provides real-time monitoring of visitor logs, resident directories, security guard activities, announcements, emergency alerts, subscription plans, and billing.
 
-To run this application:
+---
 
-```bash
-npm install
-npm run start
-```
+## Tech Stack
 
-# Building For Production
+- **Runtime & Package Manager**: [Bun](https://bun.sh/)
+- **Frontend Framework**: [React 19](https://react.dev/) + [Vite](https://vite.dev/)
+- **Routing**: [TanStack Router](https://tanstack.com/router) (file-based routing in `src/routes/`)
+- **Data Fetching & Server State**: [TanStack Query v5](https://tanstack.com/query)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) & [DaisyUI v5](https://daisyui.com/)
+- **Interactive Primitives**: [@headlessui/react v2](https://headlessui.com/)
+- **Client State**: [Jotai](https://jotai.org/) & [Zustand](https://zustand.docs.pmnd.rs/)
+- **Form Handling & Formatting**: [React Hook Form](https://react-hook-form.com/), `react-phone-number-input`, `react-number-format`
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Notifications**: [Sonner](https://sonner.emilkowal.ski/)
+- **Code Quality**: [Biome](https://biomejs.dev/) & TypeScript Native Preview (`tsgo`)
+- **Testing**: [Vitest](https://vitest.dev/)
 
-To build this application for production:
+---
 
-```bash
-npm run build
-```
+## Getting Started
 
-## Testing
+> **Note**: This project strictly uses **Bun** as its package manager and script runner.
 
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
+### Prerequisites
 
-```bash
-npm run test
-```
+- [Bun](https://bun.sh/) (v1.1+ recommended)
 
-## Styling
-
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
-
-
-## Linting & Formatting
-
-This project uses [Biome](https://biomejs.dev/) for linting and formatting. The following scripts are available:
-
+### Installation
 
 ```bash
-npm run lint
-npm run format
-npm run check
+bun install
 ```
 
+### Running Locally
 
-## Shadcn
-
-Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
+Start the Vite development server on port 3000:
 
 ```bash
-pnpm dlx shadcn@latest add button
+bun run dev
 ```
 
+The application will be accessible at [http://localhost:3000](http://localhost:3000).
 
+---
+
+## Building & Production
+
+To compile and produce an optimized production bundle:
+
+```bash
+bun run build
+```
+
+To preview the production build locally:
+
+```bash
+bun run preview
+```
+
+---
+
+## Quality & Verification Commands
+
+Always run Biome check and TypeScript verification before pushing code:
+
+```bash
+# Check code style, formatting, and lint rules
+bun run check
+
+# Auto-format codebase using Biome
+bun run format
+
+# Run Biome linter
+bun run lint
+
+# Run strict TypeScript type check without emitting output
+bun run typecheck
+
+# Execute unit and component tests
+bun run test
+```
+
+---
+
+## Component Architecture (`src/components/`)
+
+The application features a component system integrating **DaisyUI** and **Headless UI** for accessible, responsive UI:
+
+```
+src/components/
+├── ui/                   # Reusable base UI elements
+│   ├── Button.tsx        # Styled buttons with variant and size support
+│   ├── Card.tsx          # Card containers and headers
+│   ├── Badge.tsx         # Status badges
+│   ├── Modal.tsx         # Dialog / modal window
+│   ├── DialogModal.tsx   # Headless UI Dialog wrapper
+│   ├── BottomSheet.tsx   # Mobile-friendly bottom drawer
+│   ├── Input.tsx         # Styled input elements
+│   ├── Select.tsx        # Styled native select wrapper
+│   ├── Checkbox.tsx      # Custom checkbox controls
+│   ├── Table.tsx         # Accessible data tables
+│   ├── Tabs.tsx          # Tabbed navigation
+│   ├── StatCard.tsx      # Dashboard metrics KPI cards
+│   ├── Loader.tsx        # Spinner and PageLoader placeholders
+│   └── Alert.tsx         # System status alerts
+├── layout/               # Application-level layouts & state containers
+│   ├── DashboardLayout.tsx  # Dashboard shell with sidebar, drawer, and header
+│   ├── PageLoader.tsx       # Page-level loader, access control, and empty state
+│   └── QueryCompLayout.tsx  # Component-level TanStack Query status wrapper
+├── tables/               # Advanced data grid utilities
+│   ├── CustomTable.tsx      # Data table with sorting and styling
+│   ├── CursorPagination.tsx # Cursor-based and offset pagination bar
+│   ├── usePagination.tsx    # Pagination state hook
+│   └── pop-up.tsx           # Contextual row popover actions
+├── inputs/               # Specialized form inputs
+│   ├── PhoneNumberInput.tsx # International phone number input
+│   ├── FormattedPriceInput.tsx # Currency and price formatter input
+│   ├── SimpleInput.tsx      # Floating-label text input
+│   ├── SimpleTextArea.tsx   # Textarea component
+│   ├── MarkdownTextArea.tsx # Markdown-supported editor
+│   └── LocalSelect.tsx      # Searchable select component
+├── organisations/        # Community & organisation modules
+│   ├── OrganisationShell.tsx # Organisation view container
+│   ├── ManagedTypePanel.tsx  # Managed entity switcher
+│   └── ListFeedback.tsx      # Empty and error state display
+└── images/               # Media uploaders
+    ├── SelectImage.tsx       # Single/multiple image selector
+    ├── UpdateImages.tsx      # Image gallery and replace tool
+    └── useImages.ts          # Upload state hook
+```
+
+---
+
+## Styling & Design System
+
+- **DaisyUI v5**: Provides pre-built utility classes (`btn`, `card`, `badge`, `alert`, `table`, `loading`, etc.) with semantic color themes (`primary`, `secondary`, `neutral`, `base-100`, `error`, `success`, `warning`).
+- **Tailwind CSS v4**: Utility-first CSS classes for spacing, flexbox/grid layout, and transitions.
+- **Headless UI v2**: Unstyled, accessible UI components for dialogs, transitions, menus, and dropdowns.
+
+---
 
 ## Routing
-This project uses [TanStack Router](https://tanstack.com/router). The initial setup is a file based router. Which means that the routes are managed as files in `src/routes`.
 
-### Adding A Route
+Routing is managed by [TanStack Router](https://tanstack.com/router) via file-based routing inside `src/routes/`:
 
-To add a new route to your application just add another a new file in the `./src/routes` directory.
+- `src/routes/__root.tsx`: The root route container rendering global providers, outlets, and devtools.
+- `src/routes/dashboard/`: Protected dashboard views (organisations, users, logs, reports, subscriptions, alerts).
+- `src/routes/login.tsx`: Authentication screen.
 
-TanStack will automatically generate the content of the route file for you.
+### Navigation
 
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
+Always use the typed `Link` component from `@tanstack/react-router` for single-page transitions:
 
 ```tsx
 import { Link } from "@tanstack/react-router";
+
+<Link to="/dashboard/organisations" className="btn btn-primary">
+  View Organisations
+</Link>;
 ```
 
-Then anywhere in your JSX you can use it like so:
+---
 
-```tsx
-<Link to="/about">About</Link>
-```
+## API Services & Data Fetching
 
-This will create a link that will navigate to the `/about` route.
+### Backend Response Format
 
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
+All backend endpoints wrap responses in a standard `ApiResponse<T>` envelope:
 
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you use the `<Outlet />` component.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { Outlet, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-
-import { Link } from "@tanstack/react-router";
-
-export const Route = createRootRoute({
-  component: () => (
-    <>
-      <header>
-        <nav>
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
-        </nav>
-      </header>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  ),
-})
-```
-
-The `<TanStackRouterDevtools />` component is not required so you can remove it if you don't want it in your layout.
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-const peopleRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/people",
-  loader: async () => {
-    const response = await fetch("https://swapi.dev/api/people");
-    return response.json() as Promise<{
-      results: {
-        name: string;
-      }[];
-    }>;
-  },
-  component: () => {
-    const data = peopleRoute.useLoaderData();
-    return (
-      <ul>
-        {data.results.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    );
-  },
-});
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-### React-Query
-
-React-Query is an excellent addition or alternative to route loading and integrating it into you application is a breeze.
-
-First add your dependencies:
-
-```bash
-npm install @tanstack/react-query @tanstack/react-query-devtools
-```
-
-Next we'll need to create a query client and provider. We recommend putting those in `main.tsx`.
-
-```tsx
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-// ...
-
-const queryClient = new QueryClient();
-
-// ...
-
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-
-  root.render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-  );
+```typescript
+export interface ApiResponse<T = any> {
+  status: string; // e.g. "success"
+  statusCode: number; // e.g. 200, 201
+  message: string; // Descriptive API response message
+  payload: T; // Response data payload
 }
 ```
 
-You can also add TanStack Query Devtools to the root route (optional).
+Paginated endpoints provide a `PaginatedPayload<T>`:
 
-```tsx
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-      <ReactQueryDevtools buttonPosition="top-right" />
-      <TanStackRouterDevtools />
-    </>
-  ),
-});
+```typescript
+export interface PaginatedPayload<T> {
+  data: T[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total?: number;
+    pages?: number;
+    nextPage?: number | null;
+  };
+}
 ```
 
-Now you can use `useQuery` to fetch your data.
+### Typed Services (`src/services/`)
+
+The application features strongly-typed service modules configured to communicate with the EntXit API:
+
+- `authService`: Login, OTP verification, password resets, token refreshing.
+- `adminService`: Communities, sub-admins, security guards, resident accounts, platform fees.
+- `subscriptionService`: Subscription plans, packages, entitlements, and features.
+- `subAdminService`: Community-specific management and delegations.
+- `securityService`: Guard rosters, patrol logs, incident reports, security panic alerts.
+- `guestsService`: Visitor passes, check-in / check-out logs, pre-approvals.
+- `announcementsService`: Community broadcasts and noticeboard items.
+- `alertsService`: Emergency alerts and incident resolutions.
+- `paymentsService`: Transaction history, invoices, and billing records.
+- `usersService`: Resident profiles, vehicle registrations, and member directories.
+- `notificationsService`: In-app notification center and mark-as-read operations.
+
+### Data Fetching with `PageLoader` & `QueryCompLayout`
+
+Use `PageLoader` for page-level queries and `QueryCompLayout` for component-level queries:
 
 ```tsx
 import { useQuery } from "@tanstack/react-query";
+import { adminService } from "@/services";
+import PageLoader from "@/components/layout/PageLoader";
 
-import "./App.css";
-
-function App() {
-  const { data } = useQuery({
-    queryKey: ["people"],
-    queryFn: () =>
-      fetch("https://swapi.dev/api/people")
-        .then((res) => res.json())
-        .then((data) => data.results as { name: string }[]),
-    initialData: [],
+export function CommunitiesPage() {
+  const query = useQuery({
+    queryKey: ["communities"],
+    queryFn: () => adminService.getCommunities(),
   });
 
   return (
-    <div>
-      <ul>
-        {data.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    </div>
+    <PageLoader
+      query={query}
+      loadingText="Loading communities..."
+      emptyState={{
+        title: "No Communities Found",
+        description: "Get started by adding your first community.",
+        actionText: "Add Community",
+        onAction: () => {},
+      }}
+    >
+      {(response) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {response.payload.data.map((community) => (
+            <div key={community.id} className="card bg-base-100 shadow p-4">
+              <h3 className="font-bold">{community.name}</h3>
+              <p className="text-sm text-base-content/70">
+                {community.address}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </PageLoader>
   );
 }
-
-export default App;
 ```
 
-You can find out everything you need to know on how to use React-Query in the [React-Query documentation](https://tanstack.com/query/latest/docs/framework/react/overview).
+### Error Handling
+
+Error messages from failed requests or network drops are automatically extracted and formatted using `extract_message()` (`src/lib/api-error.ts`):
+
+```typescript
+import { extract_message } from "@/lib/api-error";
+
+// Extracts message from AxiosError, ApiResponse, Error, or string:
+const message = extract_message(error);
+```
+
+---
 
 ## State Management
 
-Another common requirement for React applications is state management. There are many options for state management in React. TanStack Store provides a great starting point for your project.
-
-First you need to add TanStack Store as a dependency:
-
-```bash
-npm install @tanstack/store
-```
-
-Now let's create a simple counter in the `src/App.tsx` file as a demonstration.
-
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-function App() {
-  const count = useStore(countStore);
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-    </div>
-  );
-}
-
-export default App;
-```
-
-One of the many nice features of TanStack Store is the ability to derive state from other state. That derived state will update when the base state updates.
-
-Let's check this out by doubling the count using derived state.
-
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store, Derived } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-const doubledStore = new Derived({
-  fn: () => countStore.state * 2,
-  deps: [countStore],
-});
-doubledStore.mount();
-
-function App() {
-  const count = useStore(countStore);
-  const doubledCount = useStore(doubledStore);
-
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-      <div>Doubled - {doubledCount}</div>
-    </div>
-  );
-}
-
-export default App;
-```
-
-We use the `Derived` class to create a new store that is derived from another store. The `Derived` class has a `mount` method that will start the derived store updating.
-
-Once we've created the derived store we can use it in the `App` component just like we would any other store using the `useStore` hook.
-
-You can find out everything you need to know on how to use TanStack Store in the [TanStack Store documentation](https://tanstack.com/store/latest).
-
-# Demo files
-
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
+- **Authentication State**: `src/store/authStore.ts` using `jotai` with storage persistence. Provides `useAuth()`, `useToken()`, and `useProfile()`.
+- **Onboarding State**: `src/store/onboarding-store.ts` using `zustand`.
+- **Server Cache**: Managed by TanStack Query with automatic caching and cache invalidation.
