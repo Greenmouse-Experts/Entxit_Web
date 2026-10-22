@@ -23,6 +23,9 @@ import { Route as DashboardSupportRouteImport } from './routes/dashboard/support
 import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
 import { Route as DashboardOrganisationsIndexRouteImport } from './routes/dashboard/organisations/index'
 import { Route as DashboardOrganisationsAlertsRouteImport } from './routes/dashboard/organisations/alerts'
+import { Route as DashboardOrganisationsHostsRouteImport } from './routes/dashboard/organisations/hosts'
+import { Route as DashboardOrganisationsKycRouteImport } from './routes/dashboard/organisations/kyc'
+import { Route as DashboardOrganisationsTypesRouteImport } from './routes/dashboard/organisations/types'
 import { Route as DashboardTestIndexRouteImport } from './routes/dashboard/test.index'
 import { Route as DashboardOrganisationsHostVisitorsHostIdRouteImport } from './routes/dashboard/organisations/host-visitors.$hostId'
 import { Route as DashboardOrganisationsSecurityActivitiesSecurityIdRouteImport } from './routes/dashboard/organisations/security-activities.$securityId'
@@ -100,6 +103,24 @@ const DashboardOrganisationsAlertsRoute =
     path: '/dashboard/organisations/alerts',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DashboardOrganisationsHostsRoute =
+  DashboardOrganisationsHostsRouteImport.update({
+    id: '/dashboard/organisations/hosts',
+    path: '/dashboard/organisations/hosts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardOrganisationsKycRoute =
+  DashboardOrganisationsKycRouteImport.update({
+    id: '/dashboard/organisations/kyc',
+    path: '/dashboard/organisations/kyc',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardOrganisationsTypesRoute =
+  DashboardOrganisationsTypesRouteImport.update({
+    id: '/dashboard/organisations/types',
+    path: '/dashboard/organisations/types',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DashboardTestIndexRoute = DashboardTestIndexRouteImport.update({
   id: '/dashboard/test/',
   path: '/dashboard/test/',
@@ -107,15 +128,15 @@ const DashboardTestIndexRoute = DashboardTestIndexRouteImport.update({
 } as any)
 const DashboardOrganisationsHostVisitorsHostIdRoute =
   DashboardOrganisationsHostVisitorsHostIdRouteImport.update({
-    id: '/host-visitors/$hostId',
-    path: '/host-visitors/$hostId',
-    getParentRoute: () => DashboardOrganisationsRoute,
+    id: '/dashboard/organisations/host-visitors/$hostId',
+    path: '/dashboard/organisations/host-visitors/$hostId',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const DashboardOrganisationsSecurityActivitiesSecurityIdRoute =
   DashboardOrganisationsSecurityActivitiesSecurityIdRouteImport.update({
-    id: '/security-activities/$securityId',
-    path: '/security-activities/$securityId',
-    getParentRoute: () => DashboardOrganisationsRoute,
+    id: '/dashboard/organisations/security-activities/$securityId',
+    path: '/dashboard/organisations/security-activities/$securityId',
+    getParentRoute: () => rootRouteImport,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -132,6 +153,9 @@ export interface FileRoutesByFullPath {
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/organisations/alerts': typeof DashboardOrganisationsAlertsRoute
+  '/dashboard/organisations/hosts': typeof DashboardOrganisationsHostsRoute
+  '/dashboard/organisations/kyc': typeof DashboardOrganisationsKycRoute
+  '/dashboard/organisations/types': typeof DashboardOrganisationsTypesRoute
   '/dashboard/organisations/': typeof DashboardOrganisationsIndexRoute
   '/dashboard/test/': typeof DashboardTestIndexRoute
   '/dashboard/organisations/host-visitors/$hostId': typeof DashboardOrganisationsHostVisitorsHostIdRoute
@@ -151,6 +175,9 @@ export interface FileRoutesByTo {
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/organisations/alerts': typeof DashboardOrganisationsAlertsRoute
+  '/dashboard/organisations/hosts': typeof DashboardOrganisationsHostsRoute
+  '/dashboard/organisations/kyc': typeof DashboardOrganisationsKycRoute
+  '/dashboard/organisations/types': typeof DashboardOrganisationsTypesRoute
   '/dashboard/organisations': typeof DashboardOrganisationsIndexRoute
   '/dashboard/test': typeof DashboardTestIndexRoute
   '/dashboard/organisations/host-visitors/$hostId': typeof DashboardOrganisationsHostVisitorsHostIdRoute
@@ -171,6 +198,9 @@ export interface FileRoutesById {
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/organisations/alerts': typeof DashboardOrganisationsAlertsRoute
+  '/dashboard/organisations/hosts': typeof DashboardOrganisationsHostsRoute
+  '/dashboard/organisations/kyc': typeof DashboardOrganisationsKycRoute
+  '/dashboard/organisations/types': typeof DashboardOrganisationsTypesRoute
   '/dashboard/organisations/': typeof DashboardOrganisationsIndexRoute
   '/dashboard/test/': typeof DashboardTestIndexRoute
   '/dashboard/organisations/host-visitors/$hostId': typeof DashboardOrganisationsHostVisitorsHostIdRoute
@@ -192,6 +222,9 @@ export interface FileRouteTypes {
     | '/dashboard/users'
     | '/dashboard/'
     | '/dashboard/organisations/alerts'
+    | '/dashboard/organisations/hosts'
+    | '/dashboard/organisations/kyc'
+    | '/dashboard/organisations/types'
     | '/dashboard/organisations/'
     | '/dashboard/test/'
     | '/dashboard/organisations/host-visitors/$hostId'
@@ -211,6 +244,9 @@ export interface FileRouteTypes {
     | '/dashboard/users'
     | '/dashboard'
     | '/dashboard/organisations/alerts'
+    | '/dashboard/organisations/hosts'
+    | '/dashboard/organisations/kyc'
+    | '/dashboard/organisations/types'
     | '/dashboard/organisations'
     | '/dashboard/test'
     | '/dashboard/organisations/host-visitors/$hostId'
@@ -230,6 +266,9 @@ export interface FileRouteTypes {
     | '/dashboard/users'
     | '/dashboard/'
     | '/dashboard/organisations/alerts'
+    | '/dashboard/organisations/hosts'
+    | '/dashboard/organisations/kyc'
+    | '/dashboard/organisations/types'
     | '/dashboard/organisations/'
     | '/dashboard/test/'
     | '/dashboard/organisations/host-visitors/$hostId'
@@ -250,8 +289,13 @@ export interface RootRouteChildren {
   DashboardUsersRoute: typeof DashboardUsersRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardOrganisationsAlertsRoute: typeof DashboardOrganisationsAlertsRoute
+  DashboardOrganisationsHostsRoute: typeof DashboardOrganisationsHostsRoute
+  DashboardOrganisationsKycRoute: typeof DashboardOrganisationsKycRoute
+  DashboardOrganisationsTypesRoute: typeof DashboardOrganisationsTypesRoute
   DashboardOrganisationsIndexRoute: typeof DashboardOrganisationsIndexRoute
   DashboardTestIndexRoute: typeof DashboardTestIndexRoute
+  DashboardOrganisationsHostVisitorsHostIdRoute: typeof DashboardOrganisationsHostVisitorsHostIdRoute
+  DashboardOrganisationsSecurityActivitiesSecurityIdRoute: typeof DashboardOrganisationsSecurityActivitiesSecurityIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -354,6 +398,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardOrganisationsAlertsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/organisations/hosts': {
+      id: '/dashboard/organisations/hosts'
+      path: '/dashboard/organisations/hosts'
+      fullPath: '/dashboard/organisations/hosts'
+      preLoaderRoute: typeof DashboardOrganisationsHostsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/organisations/kyc': {
+      id: '/dashboard/organisations/kyc'
+      path: '/dashboard/organisations/kyc'
+      fullPath: '/dashboard/organisations/kyc'
+      preLoaderRoute: typeof DashboardOrganisationsKycRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/organisations/types': {
+      id: '/dashboard/organisations/types'
+      path: '/dashboard/organisations/types'
+      fullPath: '/dashboard/organisations/types'
+      preLoaderRoute: typeof DashboardOrganisationsTypesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/test/': {
       id: '/dashboard/test/'
       path: '/dashboard/test'
@@ -363,17 +428,17 @@ declare module '@tanstack/react-router' {
     }
     '/dashboard/organisations/host-visitors/$hostId': {
       id: '/dashboard/organisations/host-visitors/$hostId'
-      path: '/host-visitors/$hostId'
+      path: '/dashboard/organisations/host-visitors/$hostId'
       fullPath: '/dashboard/organisations/host-visitors/$hostId'
       preLoaderRoute: typeof DashboardOrganisationsHostVisitorsHostIdRouteImport
-      parentRoute: typeof DashboardOrganisationsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/dashboard/organisations/security-activities/$securityId': {
       id: '/dashboard/organisations/security-activities/$securityId'
-      path: '/security-activities/$securityId'
+      path: '/dashboard/organisations/security-activities/$securityId'
       fullPath: '/dashboard/organisations/security-activities/$securityId'
       preLoaderRoute: typeof DashboardOrganisationsSecurityActivitiesSecurityIdRouteImport
-      parentRoute: typeof DashboardOrganisationsRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -392,8 +457,15 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardUsersRoute: DashboardUsersRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardOrganisationsAlertsRoute: DashboardOrganisationsAlertsRoute,
+  DashboardOrganisationsHostsRoute: DashboardOrganisationsHostsRoute,
+  DashboardOrganisationsKycRoute: DashboardOrganisationsKycRoute,
+  DashboardOrganisationsTypesRoute: DashboardOrganisationsTypesRoute,
   DashboardOrganisationsIndexRoute: DashboardOrganisationsIndexRoute,
   DashboardTestIndexRoute: DashboardTestIndexRoute,
+  DashboardOrganisationsHostVisitorsHostIdRoute:
+    DashboardOrganisationsHostVisitorsHostIdRoute,
+  DashboardOrganisationsSecurityActivitiesSecurityIdRoute:
+    DashboardOrganisationsSecurityActivitiesSecurityIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

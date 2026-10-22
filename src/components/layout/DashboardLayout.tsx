@@ -34,7 +34,7 @@ const menuItems = [
 	{
 		icon: AlertTriangle,
 		label: "Security Alerts",
-		href: "/dashboard/alerts",
+		href: "/dashboard/organisations/alerts",
 	},
 	{
 		icon: BarChart3,
