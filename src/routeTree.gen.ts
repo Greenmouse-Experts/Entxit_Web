@@ -27,8 +27,6 @@ import { Route as DashboardOrganisationsHostsRouteImport } from './routes/dashbo
 import { Route as DashboardOrganisationsKycRouteImport } from './routes/dashboard/organisations/kyc'
 import { Route as DashboardOrganisationsTypesRouteImport } from './routes/dashboard/organisations/types'
 import { Route as DashboardTestIndexRouteImport } from './routes/dashboard/test.index'
-import { Route as DashboardOrganisationsHostVisitorsHostIdRouteImport } from './routes/dashboard/organisations/host-visitors.$hostId'
-import { Route as DashboardOrganisationsSecurityActivitiesSecurityIdRouteImport } from './routes/dashboard/organisations/security-activities.$securityId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -126,18 +124,6 @@ const DashboardTestIndexRoute = DashboardTestIndexRouteImport.update({
   path: '/dashboard/test/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardOrganisationsHostVisitorsHostIdRoute =
-  DashboardOrganisationsHostVisitorsHostIdRouteImport.update({
-    id: '/dashboard/organisations/host-visitors/$hostId',
-    path: '/dashboard/organisations/host-visitors/$hostId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DashboardOrganisationsSecurityActivitiesSecurityIdRoute =
-  DashboardOrganisationsSecurityActivitiesSecurityIdRouteImport.update({
-    id: '/dashboard/organisations/security-activities/$securityId',
-    path: '/dashboard/organisations/security-activities/$securityId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -158,8 +144,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/organisations/types': typeof DashboardOrganisationsTypesRoute
   '/dashboard/organisations/': typeof DashboardOrganisationsIndexRoute
   '/dashboard/test/': typeof DashboardTestIndexRoute
-  '/dashboard/organisations/host-visitors/$hostId': typeof DashboardOrganisationsHostVisitorsHostIdRoute
-  '/dashboard/organisations/security-activities/$securityId': typeof DashboardOrganisationsSecurityActivitiesSecurityIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -180,8 +164,6 @@ export interface FileRoutesByTo {
   '/dashboard/organisations/types': typeof DashboardOrganisationsTypesRoute
   '/dashboard/organisations': typeof DashboardOrganisationsIndexRoute
   '/dashboard/test': typeof DashboardTestIndexRoute
-  '/dashboard/organisations/host-visitors/$hostId': typeof DashboardOrganisationsHostVisitorsHostIdRoute
-  '/dashboard/organisations/security-activities/$securityId': typeof DashboardOrganisationsSecurityActivitiesSecurityIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -203,8 +185,6 @@ export interface FileRoutesById {
   '/dashboard/organisations/types': typeof DashboardOrganisationsTypesRoute
   '/dashboard/organisations/': typeof DashboardOrganisationsIndexRoute
   '/dashboard/test/': typeof DashboardTestIndexRoute
-  '/dashboard/organisations/host-visitors/$hostId': typeof DashboardOrganisationsHostVisitorsHostIdRoute
-  '/dashboard/organisations/security-activities/$securityId': typeof DashboardOrganisationsSecurityActivitiesSecurityIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -227,8 +207,6 @@ export interface FileRouteTypes {
     | '/dashboard/organisations/types'
     | '/dashboard/organisations/'
     | '/dashboard/test/'
-    | '/dashboard/organisations/host-visitors/$hostId'
-    | '/dashboard/organisations/security-activities/$securityId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -249,8 +227,6 @@ export interface FileRouteTypes {
     | '/dashboard/organisations/types'
     | '/dashboard/organisations'
     | '/dashboard/test'
-    | '/dashboard/organisations/host-visitors/$hostId'
-    | '/dashboard/organisations/security-activities/$securityId'
   id:
     | '__root__'
     | '/'
@@ -271,8 +247,6 @@ export interface FileRouteTypes {
     | '/dashboard/organisations/types'
     | '/dashboard/organisations/'
     | '/dashboard/test/'
-    | '/dashboard/organisations/host-visitors/$hostId'
-    | '/dashboard/organisations/security-activities/$securityId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -294,8 +268,6 @@ export interface RootRouteChildren {
   DashboardOrganisationsTypesRoute: typeof DashboardOrganisationsTypesRoute
   DashboardOrganisationsIndexRoute: typeof DashboardOrganisationsIndexRoute
   DashboardTestIndexRoute: typeof DashboardTestIndexRoute
-  DashboardOrganisationsHostVisitorsHostIdRoute: typeof DashboardOrganisationsHostVisitorsHostIdRoute
-  DashboardOrganisationsSecurityActivitiesSecurityIdRoute: typeof DashboardOrganisationsSecurityActivitiesSecurityIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -426,20 +398,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTestIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/organisations/host-visitors/$hostId': {
-      id: '/dashboard/organisations/host-visitors/$hostId'
-      path: '/dashboard/organisations/host-visitors/$hostId'
-      fullPath: '/dashboard/organisations/host-visitors/$hostId'
-      preLoaderRoute: typeof DashboardOrganisationsHostVisitorsHostIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/organisations/security-activities/$securityId': {
-      id: '/dashboard/organisations/security-activities/$securityId'
-      path: '/dashboard/organisations/security-activities/$securityId'
-      fullPath: '/dashboard/organisations/security-activities/$securityId'
-      preLoaderRoute: typeof DashboardOrganisationsSecurityActivitiesSecurityIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -462,10 +420,6 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardOrganisationsTypesRoute: DashboardOrganisationsTypesRoute,
   DashboardOrganisationsIndexRoute: DashboardOrganisationsIndexRoute,
   DashboardTestIndexRoute: DashboardTestIndexRoute,
-  DashboardOrganisationsHostVisitorsHostIdRoute:
-    DashboardOrganisationsHostVisitorsHostIdRoute,
-  DashboardOrganisationsSecurityActivitiesSecurityIdRoute:
-    DashboardOrganisationsSecurityActivitiesSecurityIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
