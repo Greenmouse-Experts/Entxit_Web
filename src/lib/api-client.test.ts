@@ -95,8 +95,18 @@ describe("shared authentication state", () => {
 			return {
 				data:
 					config.url === "/auth/login-admin"
-						? { token: "login-token", user: legacyUser }
-						: { token: "refreshed-token" },
+						? {
+								payload: {
+									id: legacyUser.id,
+									email: legacyUser.email,
+									firstName: "Admin",
+									lastName: "User",
+									roles: ["admin"],
+									access_token: "login-token",
+									refresh_token: "refresh-token",
+								},
+							}
+						: { payload: { access_token: "refreshed-token" } },
 				status: 200,
 				statusText: "OK",
 				headers: {},
@@ -111,9 +121,9 @@ describe("shared authentication state", () => {
 		});
 		await authService.refreshToken();
 		expect(store.get_user_value()?.accessToken).toBe("refreshed-token");
-		expect(calls).toEqual(["/auth/login-admin", "/auth/refresh-token"]);
+		expect(calls).toEqual(["/auth/login-admin", "/auth/refresh"]);
 
-		authService.logout();
+		await authService.logout();
 		expect(store.get_user_value()).toBeNull();
 		expect(localStorage.getItem("user")).toBeNull();
 	});

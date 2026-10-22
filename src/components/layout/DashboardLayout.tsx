@@ -14,8 +14,8 @@ import {
 	Users,
 } from "lucide-react";
 import { type ReactNode, useState } from "react";
-import { useAuth } from "../hooks/useAuth";
-import { cn } from "../lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { cn } from "@/lib/utils";
 
 interface DashboardLayoutProps {
 	children: ReactNode;

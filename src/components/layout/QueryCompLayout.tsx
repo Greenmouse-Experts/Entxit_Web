@@ -1,9 +1,9 @@
-import type { ApiResponse } from "@/client/api";
-import { extract_message } from "@/helpers/auth";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { AlertCircle, RefreshCcw, ShieldOff } from "lucide-react";
 import type { ReactNode } from "react";
+import { extract_message } from "@/lib/api-error";
+import type { ApiResponse } from "@/services/types/common.types";
 
 interface QueryCompLayoutProps<T> {
 	query: UseQueryResult<T>;
@@ -54,6 +54,7 @@ export default function QueryCompLayout<T>({
 					{extract_message(query.error as AxiosError<ApiResponse>)}
 				</p>
 				<button
+					type="button"
 					onClick={() => query.refetch()}
 					className="mt-6 flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-content hover:opacity-90 transition-all active:scale-95"
 				>

@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { DashboardLayout } from '../../components/DashboardLayout'
-import { AlertTriangle } from 'lucide-react'
+import { createFileRoute } from "@tanstack/react-router";
+import { AlertTriangle } from "lucide-react";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 // import { Card, CardContent } from '../../components/ui/Card'
 // import { Button } from '../../components/ui/Button'
 // import { Input } from '../../components/ui/Input'
@@ -11,12 +11,12 @@ import { AlertTriangle } from 'lucide-react'
 // import { demoSecurityAlerts } from '../../data/demo.alerts'
 // import { useState } from 'react'
 
-export const Route = createFileRoute('/dashboard/alerts')({
-  component: SecurityAlertsPage,
-})
+export const Route = createFileRoute("/dashboard/organisations/alerts")({
+	component: SecurityAlertsPage,
+});
 
 function SecurityAlertsPage() {
-  /*
+	/*
   // Uncomment to restore full functionality
   const [searchTerm, setSearchTerm] = useState('')
   const [severityFilter, setSeverityFilter] = useState('all')
@@ -87,28 +87,26 @@ function SecurityAlertsPage() {
   }
   */
 
-  return (
-    <DashboardLayout>
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="p-6 bg-red-50 rounded-full">
-              <AlertTriangle className="w-16 h-16 text-red-600" />
-            </div>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            Security Alerts
-          </h2>
-          <p className="text-gray-600 max-w-md">
-            This page is coming soon. We're working on bringing you real-time
-            security monitoring and alert management features.
-          </p>
-        </div>
-      </div>
-    </DashboardLayout>
-  )
+	return (
+		<DashboardLayout>
+			<div className="flex items-center justify-center min-h-[60vh]">
+				<div className="text-center space-y-4">
+					<div className="flex justify-center">
+						<div className="p-6 bg-red-50 rounded-full">
+							<AlertTriangle className="w-16 h-16 text-red-600" />
+						</div>
+					</div>
+					<h2 className="text-2xl font-bold text-gray-900">Security Alerts</h2>
+					<p className="text-gray-600 max-w-md">
+						This page is coming soon. We're working on bringing you real-time
+						security monitoring and alert management features.
+					</p>
+				</div>
+			</div>
+		</DashboardLayout>
+	);
 
-  /* Full page code below - uncomment to restore
+	/* Full page code below - uncomment to restore
   return (
     <DashboardLayout>
       <div className="space-y-6">

@@ -1,14 +1,14 @@
-import { extract_message } from "@/helpers/auth";
 import type { QueryObserverResult } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
-import type { ApiResponse } from "@/api/simpleApi";
 import {
-	Loader2,
 	AlertCircle,
+	Inbox,
+	Loader2,
 	RefreshCcw,
 	ShieldOff,
-	Inbox,
 } from "lucide-react";
+import { extract_message } from "@/lib/api-error";
+import type { ApiResponse } from "@/services/types/common.types";
 
 interface EmptyStateConfig {
 	title?: string;
@@ -95,6 +95,7 @@ export default function PageLoader<TData>(props: PageLoaderProps<TData>) {
 					{extract_message(query.error as AxiosError<ApiResponse>)}
 				</p>
 				<button
+					type="button"
 					onClick={() => query.refetch()}
 					className="mt-6 flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-content hover:opacity-90 transition-all active:scale-95"
 				>
@@ -122,6 +123,7 @@ export default function PageLoader<TData>(props: PageLoaderProps<TData>) {
 				</p>
 				{emptyState.actionText && emptyState.onAction && (
 					<button
+						type="button"
 						onClick={emptyState.onAction}
 						className="mt-5 btn btn-primary btn-sm"
 					>

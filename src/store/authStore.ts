@@ -1,6 +1,7 @@
 import { useAtom } from "jotai/react";
 import { atomWithStorage } from "jotai/utils";
 import { getDefaultStore } from "jotai/vanilla";
+
 export interface UserData {
 	name?: string;
 	role?: string;
@@ -29,6 +30,9 @@ export interface AuthUser {
 	user: UserData;
 	profile?: ProfileData;
 }
+
+let inMemorySession: AuthUser | null = null;
+let inMemoryProfile: ProfileData | null = null;
 
 // Keep an existing session when upgrading from the old auth_token/user keys.
 const migrateLegacySession = () => {
@@ -80,17 +84,24 @@ export const useAuth = () => useAtom(user_atom);
 export const useProfile = () => useAtom(profile_atom);
 
 export const get_user_value = (): AuthUser | null => {
-	if (typeof window === "undefined") return null;
-	const session = getDefaultStore().get(user_atom);
+	let session = inMemorySession;
+	if (typeof window !== "undefined") {
+		session = getDefaultStore().get(user_atom) || inMemorySession;
+	}
 	return session?.accessToken && session.user?.id ? session : null;
 };
 
 export const get_profile_value = (): ProfileData | null => {
-	if (typeof window === "undefined") return null;
-	return getDefaultStore().get(profile_atom);
+	let profile = inMemoryProfile;
+	if (typeof window !== "undefined") {
+		profile = getDefaultStore().get(profile_atom) || inMemoryProfile;
+	}
+	return profile;
 };
 
 export const clear_user = () => {
+	inMemorySession = null;
+	inMemoryProfile = null;
 	const store = getDefaultStore();
 	store.set(user_atom, null);
 	store.set(profile_atom, null);
@@ -102,10 +113,12 @@ export const clear_user = () => {
 };
 
 export const set_user_value = (session: AuthUser) => {
+	inMemorySession = session;
 	getDefaultStore().set(user_atom, session);
 };
 
 export const set_profile_value = (profile: ProfileData | null) => {
+	inMemoryProfile = profile;
 	getDefaultStore().set(profile_atom, profile);
 };
 

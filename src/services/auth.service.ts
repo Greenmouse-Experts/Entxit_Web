@@ -8,11 +8,20 @@ import {
 	set_user_value,
 	type UserData,
 } from "../store/authStore";
+import type {
+	ApiResponse,
+	AuthPayload,
+	ChangePasswordDto,
+	ForgotPasswordDto,
+	LoginCredentials,
+	RegisterHostDto,
+	RegisterSubadminDto,
+	ResetPasswordDto,
+	SessionItem,
+	VerifyEmailDto,
+} from "./types";
 
-export interface LoginCredentials {
-	email: string;
-	password: string;
-}
+export type { LoginCredentials };
 
 export interface LoginResponse {
 	token?: string;
@@ -23,62 +32,231 @@ export interface LoginResponse {
 		| {
 				id: string;
 				email: string;
-				name: string;
-				role: string;
+				name?: string;
+				firstName?: string;
+				lastName?: string;
+				role?: string;
+				roles?: string[];
 		  };
 	profile?: ProfileData;
+	payload?: AuthPayload;
 }
 
-export const authService = {
-	login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
-		const { data: response } = await apiClient.post<LoginResponse>(
-			"/auth/login-admin",
-			credentials,
-		);
-		const accessToken = response.accessToken ?? response.token;
-		if (!accessToken)
-			throw new Error("Login response did not include an access token");
+const handleAuthSuccess = (resData: any): LoginResponse => {
+	const payload: AuthPayload = resData.payload ?? resData;
+	const accessToken =
+		payload.access_token ?? resData.accessToken ?? resData.token;
+	const refreshToken = payload.refresh_token ?? resData.refreshToken;
 
-		const user = response.user as UserData & { role?: string };
-		set_user_value({
-			accessToken,
-			refreshToken: response.refreshToken,
-			user: { ...user, userType: user.userType ?? user.role ?? "admin" },
-			profile: response.profile,
-		});
-		set_profile_value(response.profile ?? null);
+	if (!accessToken) {
+		throw new Error("Authentication response did not include an access token");
+	}
+
+	const role = payload.roles?.[0] ?? "admin";
+	const userObj: UserData = {
+		id: payload.id,
+		email: payload.email,
+		name:
+			`${payload.firstName ?? ""} ${payload.lastName ?? ""}`.trim() ||
+			payload.email,
+		firstName: payload.firstName,
+		lastName: payload.lastName,
+		phoneNumber: payload.phone,
+		userType: role,
+		role,
+		permissions: payload.roles ?? [role],
+		isOnboarded: true,
+	};
+
+	set_user_value({
+		accessToken,
+		refreshToken,
+		user: userObj,
+	});
+	set_profile_value(userObj as ProfileData);
+
+	return {
+		token: accessToken,
+		accessToken,
+		refreshToken,
+		user: userObj,
+		payload,
+	};
+};
+
+export const authService = {
+	/**
+	 * Login an admin user
+	 */
+	login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
+		const { data: response } = await apiClient.post<
+			ApiResponse<AuthPayload> | LoginResponse
+		>("/auth/login-admin", credentials);
+		return handleAuthSuccess(response);
+	},
+
+	/**
+	 * Login regular user (host, security, subadmin)
+	 */
+	loginUser: async (credentials: LoginCredentials): Promise<LoginResponse> => {
+		const { data: response } = await apiClient.post<
+			ApiResponse<AuthPayload> | LoginResponse
+		>("/auth/login", credentials);
+		return handleAuthSuccess(response);
+	},
+
+	/**
+	 * Register a new host user
+	 */
+	register: async (
+		data: RegisterHostDto | unknown,
+	): Promise<ApiResponse<AuthPayload>> => {
+		const { data: response } = await apiClient.post<ApiResponse<AuthPayload>>(
+			"/auth/register",
+			data,
+		);
 		return response;
 	},
 
-	logout: () => clear_user(),
+	/**
+	 * Register a new subadmin community
+	 */
+	registerSubadmin: async (
+		data: RegisterSubadminDto,
+	): Promise<ApiResponse<AuthPayload>> => {
+		const { data: response } = await apiClient.post<ApiResponse<AuthPayload>>(
+			"/auth/register/subadmin",
+			data,
+		);
+		return response;
+	},
+
+	/**
+	 * Resend verification email to user
+	 */
+	resendVerification: async (
+		email: string,
+	): Promise<ApiResponse<{ message: string }>> => {
+		const { data: response } = await apiClient.post<
+			ApiResponse<{ message: string }>
+		>("/auth/resend-verification", { email });
+		return response;
+	},
+
+	/**
+	 * Initiate forgot password process
+	 */
+	forgotPassword: async (
+		email: string,
+	): Promise<ApiResponse<{ message: string }>> => {
+		const { data: response } = await apiClient.post<
+			ApiResponse<{ message: string }>
+		>("/auth/forgot-password", { email } as ForgotPasswordDto);
+		return response;
+	},
+
+	/**
+	 * Reset user password with OTP code
+	 */
+	resetPassword: async (
+		data: ResetPasswordDto,
+	): Promise<ApiResponse<{ message: string }>> => {
+		const { data: response } = await apiClient.post<
+			ApiResponse<{ message: string }>
+		>("/auth/reset-password", data);
+		return response;
+	},
+
+	/**
+	 * Verify user email with OTP code
+	 */
+	verifyEmail: async (
+		data: VerifyEmailDto,
+	): Promise<ApiResponse<{ message: string }>> => {
+		const { data: response } = await apiClient.post<
+			ApiResponse<{ message: string }>
+		>("/auth/verify-email", data);
+		return response;
+	},
+
+	/**
+	 * Change password for authenticated user
+	 */
+	changePassword: async (
+		data: ChangePasswordDto,
+	): Promise<ApiResponse<{ message: string }>> => {
+		const { data: response } = await apiClient.post<
+			ApiResponse<{ message: string }>
+		>("/auth/change-password", data);
+		return response;
+	},
+
+	/**
+	 * Refresh access token
+	 */
+	refreshToken: async (
+		token?: string,
+	): Promise<{ token: string; refreshToken?: string }> => {
+		const currentRefresh = token ?? get_user_value()?.refreshToken;
+		const { data: response } = await apiClient.post<
+			ApiResponse<{ access_token: string; refresh_token?: string }>
+		>("/auth/refresh", { refreshToken: currentRefresh });
+		const newAccessToken =
+			response.payload?.access_token ?? (response as any).token;
+		if (newAccessToken) set_access_token(newAccessToken);
+		return {
+			token: newAccessToken,
+			refreshToken: response.payload?.refresh_token,
+		};
+	},
+
+	/**
+	 * Logout current session
+	 */
+	logout: async (): Promise<void> => {
+		try {
+			await apiClient.post("/auth/logout");
+		} catch (error) {
+			console.warn("Backend logout failed or was offline:", error);
+		} finally {
+			clear_user();
+		}
+	},
+
+	/**
+	 * List active sessions for authenticated user
+	 */
+	getSessions: async (): Promise<ApiResponse<SessionItem[]>> => {
+		const { data: response } =
+			await apiClient.get<ApiResponse<SessionItem[]>>("/auth/sessions");
+		return response;
+	},
+
+	/**
+	 * Revoke a specific session
+	 */
+	revokeSession: async (
+		sessionId: string,
+	): Promise<ApiResponse<{ message: string }>> => {
+		const { data: response } = await apiClient.delete<
+			ApiResponse<{ message: string }>
+		>(`/auth/sessions/${sessionId}`);
+		return response;
+	},
+
+	/**
+	 * Revoke all other sessions except the current one
+	 */
+	revokeOtherSessions: async (): Promise<ApiResponse<{ message: string }>> => {
+		const { data: response } =
+			await apiClient.delete<ApiResponse<{ message: string }>>(
+				"/auth/sessions",
+			);
+		return response;
+	},
+
 	getCurrentUser: (): UserData | null => get_user_value()?.user ?? null,
 	isAuthenticated: (): boolean => Boolean(get_user_value()?.accessToken),
-	register: async (data: unknown): Promise<LoginResponse> =>
-		(await apiClient.post<LoginResponse>("/auth/register", data)).data,
-	forgotPassword: async (email: string): Promise<{ message: string }> =>
-		(
-			await apiClient.post<{ message: string }>("/auth/forgot-password", {
-				email,
-			})
-		).data,
-	resetPassword: async (
-		token: string,
-		password: string,
-	): Promise<{ message: string }> =>
-		(
-			await apiClient.post<{ message: string }>("/auth/reset-password", {
-				token,
-				password,
-			})
-		).data,
-	verifyEmail: async (token: string): Promise<{ message: string }> =>
-		(await apiClient.post<{ message: string }>("/auth/verify-email", { token }))
-			.data,
-	refreshToken: async (): Promise<{ token: string }> => {
-		const { data: response } = await apiClient.post<{ token: string }>(
-			"/auth/refresh-token",
-		);
-		if (response.token) set_access_token(response.token);
-		return response;
-	},
 };
+
+export default authService;
