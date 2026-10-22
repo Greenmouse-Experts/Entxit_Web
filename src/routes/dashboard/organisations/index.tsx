@@ -1,34 +1,38 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Building2, Search, ShieldCheck, UsersRound } from "lucide-react";
-import { useDeferredValue, useState } from "react";
+import { useDeferredValue } from "react";
 import { toast } from "sonner";
-import {
-	ListFeedback,
-	PageControls,
-} from "@/components/organisations/ListFeedback";
+import { ListFeedback } from "@/components/organisations/ListFeedback";
 import { OrganisationShell } from "@/components/organisations/OrganisationShell";
+import CustomTable, { type columnType } from "@/components/tables/CustomTable";
+import { pageSizeParam, positiveInt, textParam } from "@/lib/url-search";
 import { adminService } from "@/services/admin.service";
 import type { HostCommunitySummary } from "@/services/types";
 
+type CommunitySearch = { page?: number; pageSize?: number; q?: string };
+
 export const Route = createFileRoute("/dashboard/organisations/")({
+	validateSearch: (search: Record<string, unknown>): CommunitySearch => ({
+		page: positiveInt(search.page, 1),
+		pageSize: pageSizeParam(search.pageSize),
+		q: textParam(search.q),
+	}),
 	component: CommunitiesPage,
 });
 
-const limit = 10;
-
 function CommunitiesPage() {
+	const navigate = Route.useNavigate();
+	const { page = 1, pageSize = 10, q = "" } = Route.useSearch();
+	const deferredQuery = useDeferredValue(q);
 	const queryClient = useQueryClient();
-	const [page, setPage] = useState(1);
-	const [search, setSearch] = useState("");
-	const deferredSearch = useDeferredValue(search.trim());
 	const communitiesQuery = useQuery({
-		queryKey: ["admin", "communities", page, deferredSearch],
+		queryKey: ["admin", "communities", page, pageSize, deferredQuery],
 		queryFn: () =>
 			adminService.getCommunities({
 				page,
-				limit,
-				search: deferredSearch || undefined,
+				limit: pageSize,
+				search: deferredQuery || undefined,
 			}),
 	});
 	const statsQuery = useQuery({
@@ -36,7 +40,7 @@ function CommunitiesPage() {
 		queryFn: adminService.getCommunityStats,
 	});
 	const changeStatus = useMutation({
-		mutationFn: async ({
+		mutationFn: ({
 			id,
 			action,
 		}: {
@@ -66,15 +70,11 @@ function CommunitiesPage() {
 	});
 	const rows = communitiesQuery.data?.payload?.data ?? [];
 	const meta = communitiesQuery.data?.payload;
+	const totalCount = meta?.pagination?.total ?? meta?.total ?? rows.length;
 	const totalPages =
 		meta?.pagination?.pages ??
 		meta?.pages ??
-		Math.max(
-			1,
-			Math.ceil(
-				(meta?.pagination?.total ?? meta?.total ?? rows.length) / limit,
-			),
-		);
+		Math.max(1, Math.ceil(totalCount / pageSize));
 	const stats = statsQuery.data?.payload;
 
 	function act(
@@ -91,6 +91,95 @@ function CommunitiesPage() {
 			return;
 		changeStatus.mutate({ id: community.id, action });
 	}
+
+	const columns: columnType<HostCommunitySummary>[] = [
+		{
+			key: "hostCommunityName",
+			label: "Community",
+			render: (_, community) => (
+				<>
+					<span className="font-semibold">{community.hostCommunityName}</span>
+					<span className="block text-xs text-base-content/55">
+						{[community.address, community.state].filter(Boolean).join(", ") ||
+							"Location unavailable"}
+					</span>
+				</>
+			),
+		},
+		{
+			key: "hostCommunityCategoryName",
+			label: "Category",
+			render: (_, community) => community.hostCommunityCategoryName || "—",
+		},
+		{
+			key: "totalMembers",
+			label: "Members",
+			render: (_, community) => (
+				<>
+					<span className="font-medium tabular-nums">
+						{community.totalMembers}
+					</span>
+					<span className="block text-xs text-base-content/55">
+						{community.totalGuards} guards
+					</span>
+				</>
+			),
+		},
+		{
+			key: "subscriptionPlanName",
+			label: "Subscription",
+			render: (_, community) => community.subscriptionPlanName || "No plan",
+		},
+		{
+			key: "communityStatus",
+			label: "Status",
+			render: (_, community) => (
+				<span
+					className={`badge badge-sm ${community.communityStatus === "active" ? "badge-success badge-soft" : "badge-warning badge-soft"}`}
+				>
+					{community.communityStatus}
+				</span>
+			),
+		},
+		{
+			key: "action",
+			label: "Actions",
+			className: "text-right",
+			render: (_, community) => (
+				<div className="flex justify-end gap-2">
+					{community.id && (
+						<Link
+							className="btn btn-ghost btn-xs"
+							to="/dashboard/organisations/hosts"
+						>
+							Hosts
+						</Link>
+					)}
+					<button
+						type="button"
+						className="btn btn-outline btn-xs"
+						disabled={!community.id || changeStatus.isPending}
+						onClick={() =>
+							act(
+								community,
+								community.communityStatus === "active" ? "disable" : "enable",
+							)
+						}
+					>
+						{community.communityStatus === "active" ? "Disable" : "Enable"}
+					</button>
+					<button
+						type="button"
+						className="btn btn-ghost btn-xs text-error"
+						disabled={!community.id || changeStatus.isPending}
+						onClick={() => act(community, "delete")}
+					>
+						Delete
+					</button>
+				</div>
+			),
+		},
+	];
 
 	return (
 		<OrganisationShell
@@ -126,125 +215,60 @@ function CommunitiesPage() {
 					</div>
 				))}
 			</div>
-			<div className="rounded-box border border-base-300 bg-base-100 shadow-sm">
-				<div className="flex flex-wrap items-center justify-between gap-3 p-4">
-					<div>
-						<h2 className="font-semibold">All communities</h2>
-						<p className="text-sm text-base-content/60">
-							Search and manage registered communities
-						</p>
-					</div>
-					<label className="input input-bordered flex w-full items-center gap-2 sm:w-72">
-						<Search
-							aria-hidden="true"
-							className="size-4 text-base-content/50"
-						/>
-						<input
-							value={search}
-							onChange={(event) => {
-								setSearch(event.target.value);
-								setPage(1);
-							}}
-							placeholder="Search communities"
-							aria-label="Search communities"
-							className="grow"
-						/>
-					</label>
+			<div className="flex flex-wrap items-center justify-between gap-3">
+				<div>
+					<h2 className="font-semibold">All communities</h2>
+					<p className="text-sm text-base-content/60">
+						Search and manage registered communities
+					</p>
 				</div>
-				<ListFeedback
-					loading={communitiesQuery.isLoading}
-					error={communitiesQuery.isError}
-					empty={rows.length === 0}
-				>
-					<div className="overflow-x-auto">
-						<table className="table table-zebra">
-							<thead>
-								<tr>
-									<th>Community</th>
-									<th>Category</th>
-									<th>Members</th>
-									<th>Subscription</th>
-									<th>Status</th>
-									<th className="text-right">Actions</th>
-								</tr>
-							</thead>
-							<tbody>
-								{rows.map((community) => (
-									<tr key={community.id ?? community.hostCommunityName}>
-										<td>
-											<span className="font-medium">
-												{community.hostCommunityName}
-											</span>
-											<span className="block text-xs text-base-content/55">
-												{[community.address, community.state]
-													.filter(Boolean)
-													.join(", ") || "Location unavailable"}
-											</span>
-										</td>
-										<td>{community.hostCommunityCategoryName || "—"}</td>
-										<td>
-											{community.totalMembers}{" "}
-											<span className="text-xs text-base-content/55">
-												· {community.totalGuards} guards
-											</span>
-										</td>
-										<td>{community.subscriptionPlanName || "No plan"}</td>
-										<td>
-											<span
-												className={`badge badge-sm ${community.communityStatus === "active" ? "badge-success badge-soft" : "badge-warning badge-soft"}`}
-											>
-												{community.communityStatus}
-											</span>
-										</td>
-										<td>
-											<div className="flex justify-end gap-2">
-												{community.id && (
-													<Link
-														className="btn btn-ghost btn-xs"
-														to="/dashboard/organisations/hosts"
-													>
-														Hosts
-													</Link>
-												)}
-												<button
-													type="button"
-													className="btn btn-outline btn-xs"
-													disabled={!community.id || changeStatus.isPending}
-													onClick={() =>
-														act(
-															community,
-															community.communityStatus === "active"
-																? "disable"
-																: "enable",
-														)
-													}
-												>
-													{community.communityStatus === "active"
-														? "Disable"
-														: "Enable"}
-												</button>
-												<button
-													type="button"
-													className="btn btn-ghost btn-xs text-error"
-													disabled={!community.id || changeStatus.isPending}
-													onClick={() => act(community, "delete")}
-												>
-													Delete
-												</button>
-											</div>
-										</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-					</div>
-				</ListFeedback>
-				<PageControls
-					page={page}
-					totalPages={totalPages}
-					onPageChange={setPage}
-				/>
+				<label className="input input-bordered flex w-full items-center gap-2 sm:w-72">
+					<Search aria-hidden="true" className="size-4 text-base-content/50" />
+					<input
+						value={q}
+						onChange={(event) =>
+							navigate({
+								search: (prev) => ({
+									...prev,
+									q: event.target.value || undefined,
+									page: 1,
+								}),
+								replace: true,
+							})
+						}
+						placeholder="Search communities"
+						aria-label="Search communities"
+						className="grow"
+					/>
+				</label>
 			</div>
+			<ListFeedback
+				loading={communitiesQuery.isLoading}
+				error={communitiesQuery.isError}
+				empty={false}
+			>
+				<CustomTable
+					data={rows}
+					columns={columns}
+					caption="Communities"
+					totalCount={totalCount}
+					emptyMessage="No communities match this search."
+					paginationProps={{
+						page,
+						pageSize,
+						totalPages,
+						setPagination: (nextPage, nextSize) =>
+							navigate({
+								search: (prev) => ({
+									...prev,
+									page: nextPage,
+									pageSize: nextSize ?? prev.pageSize,
+								}),
+								replace: true,
+							}),
+					}}
+				/>
+			</ListFeedback>
 		</OrganisationShell>
 	);
 }

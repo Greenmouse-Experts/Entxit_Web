@@ -1,38 +1,57 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useId, useState } from "react";
+import { useDeferredValue, useId, useState } from "react";
 import { toast } from "sonner";
-import {
-	ListFeedback,
-	PageControls,
-} from "@/components/organisations/ListFeedback";
+import { ListFeedback } from "@/components/organisations/ListFeedback";
 import { OrganisationShell } from "@/components/organisations/OrganisationShell";
+import CustomTable, { type columnType } from "@/components/tables/CustomTable";
+import { pageSizeParam, positiveInt, textParam } from "@/lib/url-search";
 import { adminService } from "@/services/admin.service";
 import type { KycSubmission } from "@/services/types";
 
+type KycStatus = "pending" | "approved" | "rejected" | "all";
+type KycSearch = {
+	page?: number;
+	pageSize?: number;
+	status?: KycStatus;
+	communityId?: string;
+};
+const statuses: KycStatus[] = ["pending", "approved", "rejected", "all"];
+
 export const Route = createFileRoute("/dashboard/organisations/kyc")({
+	validateSearch: (search: Record<string, unknown>): KycSearch => ({
+		page: positiveInt(search.page, 1),
+		pageSize: pageSizeParam(search.pageSize),
+		status: statuses.includes(search.status as KycStatus)
+			? (search.status as KycStatus)
+			: "pending",
+		communityId: textParam(search.communityId),
+	}),
 	component: KycPage,
 });
 
-const limit = 10;
-
 function KycPage() {
+	const navigate = Route.useNavigate();
+	const {
+		page = 1,
+		pageSize = 10,
+		status = "pending",
+		communityId = "",
+	} = Route.useSearch();
+	const deferredCommunityId = useDeferredValue(communityId);
 	const reasonId = useId();
 	const rejectTitleId = useId();
 	const queryClient = useQueryClient();
-	const [page, setPage] = useState(1);
-	const [status, setStatus] = useState("pending");
-	const [communityId, setCommunityId] = useState("");
 	const [selected, setSelected] = useState<KycSubmission | null>(null);
 	const [reason, setReason] = useState("");
 	const query = useQuery({
-		queryKey: ["admin", "kyc", page, status, communityId],
+		queryKey: ["admin", "kyc", page, pageSize, status, deferredCommunityId],
 		queryFn: () =>
 			adminService.getKycSubmissions({
 				page,
-				limit,
+				limit: pageSize,
 				status: status === "all" ? undefined : status,
-				communityId: communityId.trim() || undefined,
+				communityId: deferredCommunityId || undefined,
 			}),
 	});
 	const review = useMutation({
@@ -64,160 +83,182 @@ function KycPage() {
 	});
 	const submissions = query.data?.payload?.data ?? [];
 	const meta = query.data?.payload;
+	const totalCount =
+		meta?.pagination?.total ?? meta?.total ?? submissions.length;
 	const totalPages =
 		meta?.pagination?.pages ??
 		meta?.pages ??
-		Math.max(
-			1,
-			Math.ceil(
-				(meta?.pagination?.total ?? meta?.total ?? submissions.length) / limit,
+		Math.max(1, Math.ceil(totalCount / pageSize));
+	const columns: columnType<KycSubmission>[] = [
+		{
+			key: "userName",
+			label: "Applicant",
+			render: (_, submission) => (
+				<>
+					<span className="font-semibold">
+						{submission.userName || submission.userId}
+					</span>
+					<span className="block text-xs text-base-content/55">
+						{submission.userEmail}
+					</span>
+				</>
 			),
-		);
+		},
+		{
+			key: "communityName",
+			label: "Community",
+			render: (_, submission) =>
+				submission.communityName || submission.communityId,
+		},
+		{
+			key: "submittedAt",
+			label: "Submitted",
+			render: (_, submission) =>
+				submission.submittedAt
+					? new Date(submission.submittedAt).toLocaleDateString()
+					: "—",
+		},
+		{
+			key: "documents",
+			label: "Documents",
+			render: (_, submission) =>
+				submission.documents?.length ? (
+					<div className="flex flex-wrap gap-2">
+						{submission.documents.map((document) => (
+							<a
+								key={`${document.type}-${document.url}`}
+								className="link link-primary text-xs"
+								href={document.url}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{document.type}
+							</a>
+						))}
+					</div>
+				) : (
+					"—"
+				),
+		},
+		{
+			key: "status",
+			label: "Status",
+			render: (_, submission) => (
+				<span
+					className={`badge badge-sm ${submission.status === "approved" ? "badge-success badge-soft" : submission.status === "rejected" ? "badge-error badge-soft" : "badge-warning badge-soft"}`}
+				>
+					{submission.status}
+				</span>
+			),
+		},
+		{
+			key: "action",
+			label: "Review",
+			className: "text-right",
+			render: (_, submission) => (
+				<div className="flex justify-end gap-2">
+					<button
+						type="button"
+						className="btn btn-success btn-outline btn-xs"
+						disabled={review.isPending || submission.status !== "pending"}
+						onClick={() => {
+							if (
+								window.confirm(
+									`Approve ${submission.userName || submission.userId}?`,
+								)
+							)
+								review.mutate({ submission, decision: "approve" });
+						}}
+					>
+						Approve
+					</button>
+					<button
+						type="button"
+						className="btn btn-error btn-outline btn-xs"
+						disabled={review.isPending || submission.status !== "pending"}
+						onClick={() => setSelected(submission)}
+					>
+						Reject
+					</button>
+				</div>
+			),
+		},
+	];
 
 	return (
 		<OrganisationShell
 			title="KYC reviews"
 			description="Review identity submissions before hosts join a community."
 		>
-			<div className="rounded-box border border-base-300 bg-base-100 shadow-sm">
-				<div className="flex flex-wrap gap-3 p-4">
-					<label className="form-control">
-						<span className="mb-1 block text-xs font-medium">Status</span>
-						<select
-							className="select select-bordered"
-							value={status}
-							onChange={(event) => {
-								setStatus(event.target.value);
-								setPage(1);
-							}}
-						>
-							<option value="pending">Pending</option>
-							<option value="approved">Approved</option>
-							<option value="rejected">Rejected</option>
-							<option value="all">All statuses</option>
-						</select>
-					</label>
-					<label className="form-control">
-						<span className="mb-1 block text-xs font-medium">Community ID</span>
-						<input
-							className="input input-bordered"
-							value={communityId}
-							onChange={(event) => {
-								setCommunityId(event.target.value);
-								setPage(1);
-							}}
-							placeholder="All communities"
-						/>
-					</label>
-				</div>
-				<ListFeedback
-					loading={query.isLoading}
-					error={query.isError}
-					empty={submissions.length === 0}
-				>
-					<div className="overflow-x-auto">
-						<table className="table table-zebra">
-							<thead>
-								<tr>
-									<th>Applicant</th>
-									<th>Community</th>
-									<th>Submitted</th>
-									<th>Documents</th>
-									<th>Status</th>
-									<th className="text-right">Review</th>
-								</tr>
-							</thead>
-							<tbody>
-								{submissions.map((submission) => (
-									<tr key={submission.id}>
-										<td>
-											<span className="font-medium">
-												{submission.userName || submission.userId}
-											</span>
-											<span className="block text-xs text-base-content/55">
-												{submission.userEmail}
-											</span>
-										</td>
-										<td>
-											{submission.communityName || submission.communityId}
-										</td>
-										<td>
-											{submission.submittedAt
-												? new Date(submission.submittedAt).toLocaleDateString()
-												: "—"}
-										</td>
-										<td>
-											{submission.documents?.length ? (
-												<div className="flex flex-wrap gap-2">
-													{submission.documents.map((document) => (
-														<a
-															key={`${document.type}-${document.url}`}
-															className="link link-primary text-xs"
-															href={document.url}
-															target="_blank"
-															rel="noopener noreferrer"
-														>
-															{document.type}
-														</a>
-													))}
-												</div>
-											) : (
-												"—"
-											)}
-										</td>
-										<td>
-											<span
-												className={`badge badge-sm ${submission.status === "approved" ? "badge-success badge-soft" : submission.status === "rejected" ? "badge-error badge-soft" : "badge-warning badge-soft"}`}
-											>
-												{submission.status}
-											</span>
-										</td>
-										<td>
-											<div className="flex justify-end gap-2">
-												<button
-													type="button"
-													className="btn btn-success btn-outline btn-xs"
-													disabled={
-														review.isPending || submission.status !== "pending"
-													}
-													onClick={() => {
-														if (
-															window.confirm(
-																`Approve ${submission.userName || submission.userId}?`,
-															)
-														)
-															review.mutate({
-																submission,
-																decision: "approve",
-															});
-													}}
-												>
-													Approve
-												</button>
-												<button
-													type="button"
-													className="btn btn-error btn-outline btn-xs"
-													disabled={
-														review.isPending || submission.status !== "pending"
-													}
-													onClick={() => setSelected(submission)}
-												>
-													Reject
-												</button>
-											</div>
-										</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-					</div>
-				</ListFeedback>
-				<PageControls
-					page={page}
-					totalPages={totalPages}
-					onPageChange={setPage}
-				/>
+			<div className="flex flex-wrap gap-3">
+				<label className="form-control">
+					<span className="mb-1 block text-xs font-medium">Status</span>
+					<select
+						className="select select-bordered"
+						value={status}
+						onChange={(event) =>
+							navigate({
+								search: (prev) => ({
+									...prev,
+									status: event.target.value as KycStatus,
+									page: 1,
+								}),
+								replace: true,
+							})
+						}
+					>
+						<option value="pending">Pending</option>
+						<option value="approved">Approved</option>
+						<option value="rejected">Rejected</option>
+						<option value="all">All statuses</option>
+					</select>
+				</label>
+				<label className="form-control">
+					<span className="mb-1 block text-xs font-medium">Community ID</span>
+					<input
+						className="input input-bordered"
+						value={communityId}
+						onChange={(event) =>
+							navigate({
+								search: (prev) => ({
+									...prev,
+									communityId: event.target.value || undefined,
+									page: 1,
+								}),
+								replace: true,
+							})
+						}
+						placeholder="All communities"
+					/>
+				</label>
 			</div>
+			<ListFeedback
+				loading={query.isLoading}
+				error={query.isError}
+				empty={false}
+			>
+				<CustomTable
+					data={submissions}
+					columns={columns}
+					caption="KYC submissions"
+					totalCount={totalCount}
+					emptyMessage="No KYC submissions match these filters."
+					paginationProps={{
+						page,
+						pageSize,
+						totalPages,
+						setPagination: (nextPage, nextSize) =>
+							navigate({
+								search: (prev) => ({
+									...prev,
+									page: nextPage,
+									pageSize: nextSize ?? prev.pageSize,
+								}),
+								replace: true,
+							}),
+					}}
+				/>
+			</ListFeedback>
 			{selected && (
 				<div className="modal modal-open" role="presentation">
 					<div

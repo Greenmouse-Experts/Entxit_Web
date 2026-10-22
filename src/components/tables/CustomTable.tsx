@@ -1,161 +1,214 @@
-import { useState } from "react";
-import type { usePagination } from "@/components/tables/usePagination";
+import { ChevronLeft, ChevronRight, Inbox } from "lucide-react";
+import { type ReactNode, useState } from "react";
+import { cn } from "@/lib/utils";
 import CursorPagination, {
 	type CursorPaginationProps,
 } from "./CursorPagination";
 import PopUp, { type Actions } from "./pop-up";
-//table type
-export type columnType<T = any> = {
+
+export type columnType<T> = {
 	key: string;
 	label: string;
-	render?: (value: any, item: T) => any;
+	render?: (value: unknown, item: T) => ReactNode;
+	className?: string;
 };
 
-interface CustomTableProps {
-	data?: any[];
-	columns?: columnType[];
-	actions?: Actions[];
-	user?: any;
-	ring?: boolean;
-	totalCount?: number;
-	paginationProps?: ReturnType<typeof usePagination>;
-	cursorPaginationProps?: CursorPaginationProps;
-	onRowClick?: (item: any) => void;
-	color?: "primary" | "secondary" | "acccent";
+export interface TablePagination {
+	page: number;
+	pageSize: number;
+	totalPages?: number;
+	setPagination: (page: number, pageSize?: number) => void;
 }
 
-export default function CustomTable(props: CustomTableProps) {
-	const [selectedItem, setSelectedItem] = useState<number | null>(null);
-	const { onRowClick } = props;
-	const pagination = props?.paginationProps;
-	const page = pagination?.page || 1;
-	const pageSize = pagination?.pageSize || 10;
-	const { ring = true, totalCount = props.data?.length || 0 } = props;
+interface CustomTableProps<T extends object> {
+	data: T[];
+	columns: columnType<T>[];
+	actions?: Actions<T>[];
+	caption?: string;
+	emptyMessage?: string;
+	ring?: boolean;
+	totalCount?: number;
+	paginationProps?: TablePagination;
+	cursorPaginationProps?: CursorPaginationProps;
+	onRowClick?: (item: T) => void;
+	rowKey?: (item: T) => string;
+}
 
-	const startRange = totalCount > 0 ? (page - 1) * pageSize + 1 : 0;
-	const endRange = Math.min(page * pageSize, totalCount);
+export default function CustomTable<T extends object>({
+	data,
+	columns,
+	actions,
+	caption,
+	emptyMessage = "No records match this view.",
+	ring = true,
+	totalCount = data.length,
+	paginationProps,
+	cursorPaginationProps,
+	onRowClick,
+	rowKey,
+}: CustomTableProps<T>) {
+	const [selectedItem, setSelectedItem] = useState<number | null>(null);
+	const page = paginationProps?.page ?? 1;
+	const pageSize = paginationProps?.pageSize ?? 10;
 	const totalPages =
-		totalCount > 0 ? Math.max(1, Math.ceil(totalCount / pageSize)) : 1;
+		paginationProps?.totalPages ??
+		Math.max(1, Math.ceil(totalCount / pageSize));
+	const startRange = data.length > 0 ? (page - 1) * pageSize + 1 : 0;
+	const endRange =
+		data.length > 0 ? Math.min(startRange + data.length - 1, totalCount) : 0;
+	const hasActions =
+		Boolean(actions?.length) &&
+		!columns.some((column) => column.key === "action");
+	const getKey = (item: T) =>
+		rowKey?.(item) ?? ("id" in item ? String(item.id) : JSON.stringify(item));
 
 	return (
 		<div
-			className={
-				"bg-base-100 shadow-md ring ring-current/20 " +
-				(ring ? " rounded-box " : "rounded-b-box")
-			}
+			className={cn(
+				"overflow-hidden bg-base-100",
+				ring && "rounded-box border border-base-300 shadow-sm",
+			)}
 		>
-			<div className="relative overflow-x-scroll">
-				<table className="table w-full text-md">
-					<thead>
-						<tr className="rounded-2xl bg-base-200/50">
-							{props.columns &&
-								props.columns.map((column) => (
-									<th
-										key={column.key}
-										className="capitalize text-left text-md font-semibold text-base-content/70"
-									>
-										{column.label}
-									</th>
-								))}
-							{!props.columns?.find((item) => item.key === "action") &&
-								props.actions &&
-								props.actions.length > 0 && (
-									<th className="font-semibold text-md text-base-content/70">
-										Action
-									</th>
-								)}
+			<div className="overflow-x-auto">
+				<table className="table w-full text-sm">
+					{caption && <caption className="sr-only">{caption}</caption>}
+					<thead className="bg-base-200/70 text-base-content/70">
+						<tr>
+							{columns.map((column) => (
+								<th
+									key={column.key}
+									scope="col"
+									className={cn(
+										"whitespace-nowrap px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide",
+										column.className,
+									)}
+								>
+									{column.label}
+								</th>
+							))}
+							{hasActions && (
+								<th
+									scope="col"
+									className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide"
+								>
+									Actions
+								</th>
+							)}
 						</tr>
 					</thead>
-					<tbody>
-						{props.data &&
-							props.data.map((item, rowIdx) => {
-								return (
-									<tr
-										key={item.id ?? JSON.stringify(item)}
-										className={`hover:bg-base-300 border-base-300 ${onRowClick ? "cursor-pointer" : ""}`}
-										onClick={() => onRowClick?.(item)}
-									>
-										{props.columns?.map((col) => (
+					<tbody className="divide-y divide-base-200">
+						{data.length === 0 ? (
+							<tr>
+								<td
+									colSpan={columns.length + Number(hasActions)}
+									className="px-5 py-14 text-center"
+								>
+									<div className="flex flex-col items-center gap-2 text-base-content/60">
+										<Inbox aria-hidden="true" className="size-7" />
+										<span>{emptyMessage}</span>
+									</div>
+								</td>
+							</tr>
+						) : (
+							data.map((item, rowIndex) => (
+								<tr
+									key={getKey(item)}
+									className={cn(
+										"transition-colors hover:bg-base-200/50",
+										onRowClick && "cursor-pointer focus-within:bg-base-200/50",
+									)}
+									onClick={() => onRowClick?.(item)}
+								>
+									{columns.map((column) => {
+										const value = (item as Record<string, unknown>)[column.key];
+										return (
 											<td
-												className="py-3 px-4 text-ellipsis overflow-hidden max-w-xs text-base-content"
-												key={col.key}
+												key={column.key}
+												className={cn(
+													"max-w-xs px-5 py-4 align-middle text-base-content",
+													column.className,
+												)}
 											>
-												{col.render
-													? col.render(item[col.key], item)
-													: item[col.key]}
+												{column.render
+													? column.render(value, item)
+													: String(value ?? "—")}
 											</td>
-										))}
-										{!props.columns?.find((item) => item.key === "action") &&
-											props.actions &&
-											props.actions.length > 0 && (
-												<td>
-													<PopUp
-														itemIndex={rowIdx}
-														setIndex={setSelectedItem}
-														currentIndex={selectedItem}
-														key={item.id ?? JSON.stringify(item)}
-														actions={props?.actions || []}
-														item={item}
-													/>
-												</td>
-											)}
-									</tr>
-								);
-							})}
+										);
+									})}
+									{hasActions && (
+										<td className="px-5 py-3 text-right">
+											<PopUp
+												itemIndex={rowIndex}
+												setIndex={setSelectedItem}
+												currentIndex={selectedItem}
+												actions={actions ?? []}
+												item={item}
+											/>
+										</td>
+									)}
+								</tr>
+							))
+						)}
 					</tbody>
 				</table>
 			</div>
-
-			{props.paginationProps && (
-				<div className="flex items-center justify-between px-4 py-3 bg-base-200/30 border-t border-base-300">
-					<div className="text-sm text-base-content/60">
-						Showing <span className="font-medium">{startRange}</span> to{" "}
-						<span className="font-medium">{endRange}</span> of{" "}
-						<span className="font-medium">{totalCount}</span> results
-						{totalCount > 0 && (
-							<span className="ml-1 text-xs text-base-content/40">
-								({totalPages} {totalPages === 1 ? "page" : "pages"})
-							</span>
-						)}
-					</div>
-					<div className="join">
-						<button
-							type="button"
-							className="join-item btn btn-sm"
-							onClick={() => {
-								if (pagination) {
-									pagination.setPagination(Math.max(1, page - 1));
+			{paginationProps && (
+				<div className="flex flex-wrap items-center justify-between gap-3 border-t border-base-300 bg-base-100 px-5 py-3">
+					<p className="text-sm tabular-nums text-base-content/65">
+						Showing{" "}
+						<strong className="font-semibold text-base-content">
+							{startRange}–{endRange}
+						</strong>{" "}
+						of{" "}
+						<strong className="font-semibold text-base-content">
+							{totalCount}
+						</strong>
+					</p>
+					<div className="flex flex-wrap items-center gap-2">
+						<label className="flex items-center gap-2 text-sm text-base-content/65">
+							Rows per page{" "}
+							<select
+								className="select select-bordered select-sm"
+								value={pageSize}
+								onChange={(event) =>
+									paginationProps.setPagination(1, Number(event.target.value))
 								}
-							}}
-							disabled={page === 1}
-						>
-							«
-						</button>
-						<button type="button" className="join-item btn btn-sm btn-active">
+							>
+								{[10, 25, 50].map((size) => (
+									<option key={size} value={size}>
+										{size}
+									</option>
+								))}
+							</select>
+						</label>
+						<span className="mr-1 text-sm tabular-nums text-base-content/65">
 							Page {page} of {totalPages}
+						</span>
+						<button
+							type="button"
+							className="btn btn-outline btn-sm btn-square"
+							aria-label="Previous page"
+							disabled={page <= 1}
+							onClick={() => paginationProps.setPagination(page - 1)}
+						>
+							<ChevronLeft aria-hidden="true" className="size-4" />
 						</button>
 						<button
 							type="button"
-							className="join-item btn btn-sm"
-							onClick={() => {
-								if (pagination) {
-									pagination.setPagination(page + 1);
-								}
-							}}
-							disabled={endRange >= totalCount}
+							className="btn btn-outline btn-sm btn-square"
+							aria-label="Next page"
+							disabled={page >= totalPages}
+							onClick={() => paginationProps.setPagination(page + 1)}
 						>
-							»
+							<ChevronRight aria-hidden="true" className="size-4" />
 						</button>
 					</div>
 				</div>
 			)}
-
-			{props.cursorPaginationProps && (
+			{cursorPaginationProps && (
 				<CursorPagination
-					{...props.cursorPaginationProps}
-					totalCount={
-						props.totalCount ?? props.cursorPaginationProps.totalCount
-					}
+					{...cursorPaginationProps}
+					totalCount={totalCount ?? cursorPaginationProps.totalCount}
 				/>
 			)}
 		</div>
