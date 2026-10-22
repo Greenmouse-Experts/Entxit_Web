@@ -56,7 +56,7 @@ export function OrganisationShell({
 					{sections.map(({ to, label, icon: Icon }) => (
 						<Link
 							key={to}
-							to={to as any}
+							to={to}
 							activeOptions={{ exact: true }}
 							className="inline-flex items-center gap-2 border-b-2 border-transparent px-3 py-3 text-sm font-medium text-base-content/65 hover:text-base-content"
 							activeProps={{ className: "border-primary text-primary" }}
