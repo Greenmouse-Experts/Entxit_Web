@@ -19,6 +19,7 @@ import { Route as CommunityIndexRouteImport } from './routes/community/index'
 import { Route as CommunityAnnouncementsRouteImport } from './routes/community/announcements'
 import { Route as CommunityReportsRouteImport } from './routes/community/reports'
 import { Route as CommunitySecuritiesRouteImport } from './routes/community/securities'
+import { Route as CommunitySettingsRouteImport } from './routes/community/settings'
 import { Route as CommunitySubscriptionRouteImport } from './routes/community/subscription'
 import { Route as CommunityTenantsRouteImport } from './routes/community/tenants'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
@@ -91,6 +92,11 @@ const CommunityReportsRoute = CommunityReportsRouteImport.update({
 const CommunitySecuritiesRoute = CommunitySecuritiesRouteImport.update({
   id: '/securities',
   path: '/securities',
+  getParentRoute: () => CommunityRouteRoute,
+} as any)
+const CommunitySettingsRoute = CommunitySettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => CommunityRouteRoute,
 } as any)
 const CommunitySubscriptionRoute = CommunitySubscriptionRouteImport.update({
@@ -228,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/community/announcements': typeof CommunityAnnouncementsRoute
   '/community/reports': typeof CommunityReportsRoute
   '/community/securities': typeof CommunitySecuritiesRoute
+  '/community/settings': typeof CommunitySettingsRoute
   '/community/subscription': typeof CommunitySubscriptionRoute
   '/community/tenants': typeof CommunityTenantsRoute
   '/dashboard/announcements': typeof DashboardAnnouncementsRoute
@@ -258,6 +265,7 @@ export interface FileRoutesByTo {
   '/community/announcements': typeof CommunityAnnouncementsRoute
   '/community/reports': typeof CommunityReportsRoute
   '/community/securities': typeof CommunitySecuritiesRoute
+  '/community/settings': typeof CommunitySettingsRoute
   '/community/subscription': typeof CommunitySubscriptionRoute
   '/community/tenants': typeof CommunityTenantsRoute
   '/dashboard/announcements': typeof DashboardAnnouncementsRoute
@@ -294,6 +302,7 @@ export interface FileRoutesById {
   '/community/announcements': typeof CommunityAnnouncementsRoute
   '/community/reports': typeof CommunityReportsRoute
   '/community/securities': typeof CommunitySecuritiesRoute
+  '/community/settings': typeof CommunitySettingsRoute
   '/community/subscription': typeof CommunitySubscriptionRoute
   '/community/tenants': typeof CommunityTenantsRoute
   '/dashboard/announcements': typeof DashboardAnnouncementsRoute
@@ -331,6 +340,7 @@ export interface FileRouteTypes {
     | '/community/announcements'
     | '/community/reports'
     | '/community/securities'
+    | '/community/settings'
     | '/community/subscription'
     | '/community/tenants'
     | '/dashboard/announcements'
@@ -361,6 +371,7 @@ export interface FileRouteTypes {
     | '/community/announcements'
     | '/community/reports'
     | '/community/securities'
+    | '/community/settings'
     | '/community/subscription'
     | '/community/tenants'
     | '/dashboard/announcements'
@@ -396,6 +407,7 @@ export interface FileRouteTypes {
     | '/community/announcements'
     | '/community/reports'
     | '/community/securities'
+    | '/community/settings'
     | '/community/subscription'
     | '/community/tenants'
     | '/dashboard/announcements'
@@ -501,6 +513,13 @@ declare module '@tanstack/react-router' {
       path: '/securities'
       fullPath: '/community/securities'
       preLoaderRoute: typeof CommunitySecuritiesRouteImport
+      parentRoute: typeof CommunityRouteRoute
+    }
+    '/community/settings': {
+      id: '/community/settings'
+      path: '/settings'
+      fullPath: '/community/settings'
+      preLoaderRoute: typeof CommunitySettingsRouteImport
       parentRoute: typeof CommunityRouteRoute
     }
     '/community/subscription': {
@@ -671,6 +690,7 @@ interface CommunityRouteRouteChildren {
   CommunityAnnouncementsRoute: typeof CommunityAnnouncementsRoute
   CommunityReportsRoute: typeof CommunityReportsRoute
   CommunitySecuritiesRoute: typeof CommunitySecuritiesRoute
+  CommunitySettingsRoute: typeof CommunitySettingsRoute
   CommunitySubscriptionRoute: typeof CommunitySubscriptionRoute
   CommunityTenantsRoute: typeof CommunityTenantsRoute
   CommunityIndexRoute: typeof CommunityIndexRoute
@@ -680,6 +700,7 @@ const CommunityRouteRouteChildren: CommunityRouteRouteChildren = {
   CommunityAnnouncementsRoute: CommunityAnnouncementsRoute,
   CommunityReportsRoute: CommunityReportsRoute,
   CommunitySecuritiesRoute: CommunitySecuritiesRoute,
+  CommunitySettingsRoute: CommunitySettingsRoute,
   CommunitySubscriptionRoute: CommunitySubscriptionRoute,
   CommunityTenantsRoute: CommunityTenantsRoute,
   CommunityIndexRoute: CommunityIndexRoute,

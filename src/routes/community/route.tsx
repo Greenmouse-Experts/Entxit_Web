@@ -12,6 +12,7 @@ import {
 	LogOut,
 	Megaphone,
 	Menu,
+	Settings2,
 	ShieldCheck,
 	UsersRound,
 	X,
@@ -30,6 +31,7 @@ const navigation = [
 	{ to: "/community/securities", label: "Securities", icon: ShieldCheck },
 	{ to: "/community/subscription", label: "Subscription", icon: CreditCard },
 	{ to: "/community/reports", label: "Reports", icon: BarChart3 },
+	{ to: "/community/settings", label: "Settings", icon: Settings2 },
 ] as const;
 
 interface SidebarContentProps {
