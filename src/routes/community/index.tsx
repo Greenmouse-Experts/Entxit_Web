@@ -2,8 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	ArrowUpRight,
 	BarChart3,
-	Building2,
 	CreditCard,
+	Megaphone,
 	ShieldCheck,
 	UsersRound,
 } from "lucide-react";
@@ -21,10 +21,10 @@ const sections = [
 		icon: UsersRound,
 	},
 	{
-		to: "/community/community",
-		title: "Community",
-		description: "Your facilities and shared spaces",
-		icon: Building2,
+		to: "/community/announcements",
+		title: "Announcements",
+		description: "News and notices for your community",
+		icon: Megaphone,
 	},
 	{
 		to: "/community/securities",

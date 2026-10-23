@@ -7,10 +7,10 @@ import {
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import {
 	BarChart3,
-	Building2,
 	CreditCard,
 	LayoutDashboard,
 	LogOut,
+	Megaphone,
 	Menu,
 	ShieldCheck,
 	UsersRound,
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/community")({
 const navigation = [
 	{ to: "/community", label: "Dashboard", icon: LayoutDashboard },
 	{ to: "/community/tenants", label: "Tenants", icon: UsersRound },
-	{ to: "/community/community", label: "Community", icon: Building2 },
+	{ to: "/community/announcements", label: "Announcements", icon: Megaphone },
 	{ to: "/community/securities", label: "Securities", icon: ShieldCheck },
 	{ to: "/community/subscription", label: "Subscription", icon: CreditCard },
 	{ to: "/community/reports", label: "Reports", icon: BarChart3 },
