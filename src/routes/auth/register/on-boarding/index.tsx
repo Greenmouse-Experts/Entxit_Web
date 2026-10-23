@@ -166,17 +166,6 @@ function OnboardingWizard() {
 
       {step === 1 ? (
         <form onSubmit={saveFacility} className="space-y-6 ">
-          <div className="space-y-2">
-            <label
-              htmlFor={`${id}-facilityType`}
-              className="block text-xl font-semibold text-base-content"
-            >
-              What types of facilities are within your community?
-            </label>
-            <p className="text-sm text-base-content/70">
-              Choose the option that best describes the primary facility.
-            </p>
-          </div>
           <select
             id={`${id}-facilityType`}
             name="facilityType"
