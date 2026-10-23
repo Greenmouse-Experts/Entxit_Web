@@ -8,6 +8,8 @@ export interface OnboardingFormData {
 	communityCountry: string;
 	communityState: string;
 	tenantCount: string;
+	hearAboutUs: string;
+	companyWebsite: string;
 }
 
 interface OnboardingState {
@@ -27,6 +29,8 @@ const defaultFormData: OnboardingFormData = {
 	communityCountry: "Nigeria",
 	communityState: "",
 	tenantCount: "",
+	hearAboutUs: "",
+	companyWebsite: "",
 };
 
 export const useOnboardingStore = create<OnboardingState>()(
@@ -43,16 +47,18 @@ export const useOnboardingStore = create<OnboardingState>()(
 		}),
 		{
 			name: "onboarding-storage",
-			version: 2,
+			version: 3,
 			migrate: (persistedState) => {
 				const previous = persistedState as {
+					step?: number;
 					formData?: Record<string, unknown>;
 				} | null;
 				const data = previous?.formData ?? {};
 				return {
-					step: 1,
+					step: previous?.step === 2 ? 2 : 1,
 					formData: {
 						...defaultFormData,
+						facilityType: String(data.facilityType ?? data.industry ?? ""),
 						communityAddress: String(
 							data.communityAddress ?? data.companyAddress ?? "",
 						),
@@ -64,6 +70,10 @@ export const useOnboardingStore = create<OnboardingState>()(
 							data.communityState ?? data.companyState ?? "",
 						),
 						tenantCount: String(data.tenantCount ?? ""),
+						hearAboutUs: String(data.hearAboutUs ?? data.referralSource ?? ""),
+						companyWebsite: String(
+							data.companyWebsite ?? data.communityWebsite ?? "",
+						),
 					},
 				};
 			},

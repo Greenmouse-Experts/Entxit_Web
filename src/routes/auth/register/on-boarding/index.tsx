@@ -36,6 +36,15 @@ const FACILITY_TYPES = [
 	"Other",
 ] as const;
 
+const REFERRAL_SOURCES = [
+	"Friend or colleague",
+	"Search engine",
+	"Social media",
+	"Online advert",
+	"Event or conference",
+	"Other",
+] as const;
+
 function OnboardingWizard() {
 	const id = useId();
 	const navigate = useNavigate();
@@ -52,6 +61,8 @@ function OnboardingWizard() {
 	const [address, setAddress] = useState(formData.communityAddress);
 	const [city, setCity] = useState(formData.communityCity);
 	const [tenantCount, setTenantCount] = useState(formData.tenantCount);
+	const [hearAboutUs, setHearAboutUs] = useState(formData.hearAboutUs);
+	const [companyWebsite, setCompanyWebsite] = useState(formData.companyWebsite);
 	const profileImage = useSelectImage();
 	const countries = useMemo(() => Country.getAllCountries(), []);
 	const states = useMemo(
@@ -68,6 +79,8 @@ function OnboardingWizard() {
 				companyCountry: data.communityCountry,
 				companyState: data.communityState,
 				currentTenantCount: Number(data.tenantCount),
+				hearAboutUs: data.hearAboutUs,
+				...(data.companyWebsite ? { companyWebsite: data.companyWebsite } : {}),
 			});
 			if (profileImage.image) {
 				const body = new FormData();
@@ -79,16 +92,33 @@ function OnboardingWizard() {
 		onSuccess: () => {
 			reset();
 			toast.success("Community setup complete");
-			navigate({ to: "/dashboard" });
+			navigate({ to: "/community" });
 		},
 		onError: (error) => toast.error(extract_message(error)),
 	});
 
 	function saveFacility(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		if (!facilityType || !tenantCount) return;
-		updateFormData({ facilityType, tenantCount });
+		if (!facilityType || !tenantCount || !hearAboutUs) return;
+		updateFormData({
+			facilityType,
+			tenantCount,
+			hearAboutUs,
+			companyWebsite: companyWebsite.trim(),
+		});
 		nextStep();
+	}
+
+	function goBack() {
+		updateFormData({
+			communityAddress: address,
+			communityCity: city,
+			communityCountry:
+				countries.find((item) => item.isoCode === countryCode)?.name ??
+				"Nigeria",
+			communityState: state,
+		});
+		prevStep();
 	}
 
 	function saveLocation(event: FormEvent<HTMLFormElement>) {
@@ -98,6 +128,8 @@ function OnboardingWizard() {
 			...formData,
 			facilityType,
 			tenantCount,
+			hearAboutUs,
+			companyWebsite: companyWebsite.trim(),
 			communityAddress: address.trim(),
 			communityCity: city.trim(),
 			communityCountry: country?.name ?? "Nigeria",
@@ -180,6 +212,52 @@ function OnboardingWizard() {
 							value={tenantCount}
 							onChange={(event) => setTenantCount(event.target.value)}
 							required
+						/>
+					</div>
+					<div className="space-y-1.5">
+						<label
+							htmlFor={`${id}-referralSource`}
+							className="block text-sm font-medium"
+						>
+							How did you hear about EntXit?
+						</label>
+						<select
+							id={`${id}-referralSource`}
+							name="referralSource"
+							className="select select-bordered w-full"
+							value={hearAboutUs}
+							onChange={(event) => setHearAboutUs(event.target.value)}
+							required
+						>
+							<option value="" disabled>
+								Select a source
+							</option>
+							{REFERRAL_SOURCES.map((source) => (
+								<option key={source} value={source}>
+									{source}
+								</option>
+							))}
+						</select>
+					</div>
+					<div className="space-y-1.5">
+						<label
+							htmlFor={`${id}-companyWebsite`}
+							className="block text-sm font-medium"
+						>
+							Website{" "}
+							<span className="font-normal text-base-content/60">
+								(optional)
+							</span>
+						</label>
+						<input
+							id={`${id}-companyWebsite`}
+							name="companyWebsite"
+							type="url"
+							className="input input-bordered w-full"
+							placeholder="https://example.com"
+							value={companyWebsite}
+							onChange={(event) => setCompanyWebsite(event.target.value)}
+							autoComplete="url"
 						/>
 					</div>
 					<SelectImage title="Profile image (optional)" {...profileImage} />
@@ -301,7 +379,7 @@ function OnboardingWizard() {
 						<button
 							type="button"
 							className="btn btn-ghost"
-							onClick={prevStep}
+							onClick={goBack}
 							disabled={completeMutation.isPending}
 						>
 							<ArrowLeft aria-hidden="true" className="size-4" /> Back
