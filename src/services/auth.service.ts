@@ -70,7 +70,7 @@ const handleAuthSuccess = (
 		(responseUser && "userType" in responseUser
 			? responseUser.userType
 			: undefined) ??
-		"admin";
+		"unknown";
 	const userObj: UserData = {
 		...responseUser,
 		id,

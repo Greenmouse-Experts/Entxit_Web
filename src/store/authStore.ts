@@ -50,7 +50,7 @@ const migrateLegacySession = () => {
 				accessToken: token,
 				user: {
 					...parsed,
-					userType: parsed.userType ?? parsed.role ?? "admin",
+					userType: parsed.userType ?? parsed.role ?? "unknown",
 				},
 			};
 			localStorage.setItem("user", JSON.stringify(session));
