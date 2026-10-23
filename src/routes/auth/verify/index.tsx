@@ -4,12 +4,18 @@ import { Mail } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import SimpleInput from "@/components/inputs/SimpleInput";
-import apiClient from "@/lib/api-client";
+import { extract_message } from "@/lib/api-error";
+import { authService } from "@/services/auth.service";
 
 export const Route = createFileRoute("/auth/verify/")({
 	component: RouteComponent,
-	validateSearch: (search: { email?: string }): { email: string } => {
-		return { email: search.email ?? "" };
+	validateSearch: (
+		search: Record<string, unknown>,
+	): { email: string; userId: string } => {
+		return {
+			email: typeof search.email === "string" ? search.email : "",
+			userId: typeof search.userId === "string" ? search.userId : "",
+		};
 	},
 });
 
@@ -18,42 +24,29 @@ interface VerifyForm {
 }
 
 function RouteComponent() {
-	const { email } = Route.useSearch();
+	const { email, userId } = Route.useSearch();
 	const nav = useNavigate();
 	const form = useForm<VerifyForm>();
 
 	const { mutate: verifyMutate, isPending: isVerifying } = useMutation({
 		mutationFn: (data: VerifyForm) =>
-			apiClient
-				.post("/tenant/auth/verify-email", { email, otp: data.otp })
-				.then((res) => res.data),
+			authService.verifyEmail({ userId, otpCode: data.otp.trim() }),
 		onSuccess: () => {
 			toast.success("Email verified successfully! You can now log in.");
 			nav({
 				to: "/auth/login",
-				search: { email },
+				search: { email, account: "community" },
 			});
 		},
-		onError: (err: any) => {
-			const message =
-				err?.response?.data?.message ?? err?.message ?? "Verification failed";
-			toast.error(message);
-		},
+		onError: (error: unknown) => toast.error(extract_message(error)),
 	});
 
 	const { mutate: resendMutate, isPending: isResending } = useMutation({
-		mutationFn: () =>
-			apiClient
-				.post("/tenant/auth/resend-otp", { email })
-				.then((res) => res.data),
+		mutationFn: () => authService.resendVerification(email),
 		onSuccess: () => {
 			toast.success("Verification code resent to your email.");
 		},
-		onError: (err: any) => {
-			const message =
-				err?.response?.data?.message ?? err?.message ?? "Failed to resend code";
-			toast.error(message);
-		},
+		onError: (error: unknown) => toast.error(extract_message(error)),
 	});
 
 	return (
@@ -92,7 +85,7 @@ function RouteComponent() {
 					<button
 						type="submit"
 						className="btn btn-primary btn-block mt-2"
-						disabled={isVerifying}
+						disabled={isVerifying || !userId}
 					>
 						{isVerifying ? (
 							<span className="loading loading-spinner loading-sm" />
@@ -108,7 +101,7 @@ function RouteComponent() {
 						<button
 							type="button"
 							onClick={() => resendMutate()}
-							disabled={isResending}
+							disabled={isResending || !email}
 							className="text-primary font-semibold hover:underline disabled:opacity-50"
 						>
 							{isResending ? "Resending..." : "Resend Code"}
@@ -119,7 +112,12 @@ function RouteComponent() {
 						Wait, I want to{" "}
 						<button
 							type="button"
-							onClick={() => nav({ to: "/auth/login", search: { email } })}
+							onClick={() =>
+								nav({
+									to: "/auth/login",
+									search: { email, account: "community" },
+								})
+							}
 							className="text-primary font-semibold hover:underline"
 						>
 							Sign in

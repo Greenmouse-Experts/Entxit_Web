@@ -4,19 +4,21 @@ import { toast } from "sonner";
 import { authService, type LoginCredentials } from "../services/auth.service";
 import { useAuth as useStoredAuth } from "../store/authStore";
 
-export const useAuth = () => {
+export const useAuth = (account: "admin" | "community" = "admin") => {
 	const [session] = useStoredAuth();
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 
 	const loginMutation = useMutation({
 		mutationFn: (credentials: LoginCredentials) =>
-			authService.login(credentials),
+			account === "community"
+				? authService.loginUser(credentials)
+				: authService.login(credentials),
 		onSuccess: () => {
 			toast.success("Welcome back!", {
 				description: "You have successfully logged in.",
 			});
-			navigate({ to: "/dashboard" });
+			navigate({ to: account === "community" ? "/community" : "/dashboard" });
 		},
 		onError: (error: unknown) => {
 			const apiError = error as {
@@ -39,7 +41,10 @@ export const useAuth = () => {
 			toast.success("Logged out successfully", {
 				description: "See you next time!",
 			});
-			navigate({ to: "/login" });
+			navigate({
+				to: "/auth/login",
+				search: { account: account === "community" ? "community" : undefined },
+			});
 		},
 	});
 

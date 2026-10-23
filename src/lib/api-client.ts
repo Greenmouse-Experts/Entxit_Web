@@ -38,6 +38,8 @@ const publicAuthPaths = new Set([
 	"/auth/reset-password",
 	"/auth/verify-email",
 	"/auth/resend-verification",
+	"/users/host-categories",
+	"/users/host-community-types",
 ]);
 
 const isPublicAuthRequest = (url?: string) =>

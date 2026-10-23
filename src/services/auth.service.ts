@@ -141,7 +141,7 @@ export const authService = {
 	 * Register a new host user
 	 */
 	register: async (
-		data: RegisterHostDto | unknown,
+		data: RegisterHostDto,
 	): Promise<ApiResponse<AuthPayload>> => {
 		const { data: response } = await apiClient.post<ApiResponse<AuthPayload>>(
 			"/auth/register",
