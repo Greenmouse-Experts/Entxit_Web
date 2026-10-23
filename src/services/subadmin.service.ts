@@ -7,6 +7,7 @@ import type {
 	CreateWithdrawalAccountDto,
 	DueInstance,
 	InviteSecurityGuardDto,
+	KycSubmission,
 	LinkPayoutAccountDto,
 	PaginatedResponse,
 	PaginationParams,
@@ -38,11 +39,11 @@ export const subadminService = {
 	},
 
 	getManagedCommunities: async (): Promise<
-		ApiResponse<SubadminCommunity[]>
+		ApiResponse<{ data: SubadminCommunity[] }>
 	> => {
-		const { data } = await apiClient.get<ApiResponse<SubadminCommunity[]>>(
-			"/subadmin/communities",
-		);
+		const { data } = await apiClient.get<
+			ApiResponse<{ data: SubadminCommunity[] }>
+		>("/subadmin/communities");
 		return data;
 	},
 
@@ -83,8 +84,8 @@ export const subadminService = {
 	getPendingKyc: async (
 		communityId: string,
 		params?: PaginationParams,
-	): Promise<PaginatedResponse<any>> => {
-		const { data } = await apiClient.get<PaginatedResponse<any>>(
+	): Promise<PaginatedResponse<KycSubmission>> => {
+		const { data } = await apiClient.get<PaginatedResponse<KycSubmission>>(
 			`/subadmin/kyc/pending/${communityId}`,
 			{ params },
 		);

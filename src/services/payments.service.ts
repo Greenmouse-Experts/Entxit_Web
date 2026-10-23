@@ -31,11 +31,11 @@ export const paymentsService = {
 	 */
 	initiateSubscriptionPayment: async (
 		communityId: string,
-		payload?: { email?: string },
+		payload: { planId: string; email?: string },
 	): Promise<ApiResponse<InitiatePaymentResponse>> => {
 		const { data } = await apiClient.post<ApiResponse<InitiatePaymentResponse>>(
 			`/payments/subscription/${communityId}`,
-			payload ?? {},
+			payload,
 		);
 		return data;
 	},

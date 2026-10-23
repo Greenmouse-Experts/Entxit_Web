@@ -39,7 +39,7 @@ function CommunitySettingsPage() {
 			}}
 		>
 			{(response) => {
-				const communities = response.payload ?? [];
+				const communities = response.payload.data;
 				const selected =
 					communities.find((community) => community.id === communityId) ??
 					communities[0];
@@ -48,12 +48,12 @@ function CommunitySettingsPage() {
 					<div className="mx-auto max-w-4xl space-y-7">
 						<div>
 							<Link
-								to="/community"
-								search={{ communityId: selected.id }}
+								to="/community/community/$communityId"
+								params={{ communityId: selected.id }}
 								className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 							>
 								<ArrowLeft aria-hidden="true" className="size-4" /> Back to
-								dashboard
+								community
 							</Link>
 							<h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-4xl">
 								Community settings

@@ -7,10 +7,9 @@ import {
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import {
 	BarChart3,
+	Building2,
 	CreditCard,
-	LayoutDashboard,
 	LogOut,
-	Megaphone,
 	Menu,
 	Settings2,
 	ShieldCheck,
@@ -22,12 +21,12 @@ import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/community")({
 	component: CommunityLayout,
+	ssr: false,
 });
 
 const navigation = [
-	{ to: "/community", label: "Dashboard", icon: LayoutDashboard },
+	{ to: "/community", label: "Communities", icon: Building2 },
 	{ to: "/community/tenants", label: "Tenants", icon: UsersRound },
-	{ to: "/community/announcements", label: "Announcements", icon: Megaphone },
 	{ to: "/community/securities", label: "Securities", icon: ShieldCheck },
 	{ to: "/community/subscription", label: "Subscription", icon: CreditCard },
 	{ to: "/community/reports", label: "Reports", icon: BarChart3 },
@@ -95,7 +94,7 @@ function SidebarContent({
 
 function CommunityLayout() {
 	const [menuOpen, setMenuOpen] = useState(false);
-	const { user, logout, isLoggingOut } = useAuth();
+	const { user, logout, isLoggingOut } = useAuth("community");
 	const name =
 		[user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
 		user?.name ||

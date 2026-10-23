@@ -43,7 +43,7 @@ export interface CommunitySubscription {
 	communityName?: string;
 	planId: string;
 	planName?: string;
-	status: "active" | "suspended" | "expired" | "grace_period" | string;
+	status?: "active" | "suspended" | "expired" | "grace_period" | string;
 	startDate: string;
 	expiresAt: string;
 	autoRenew?: boolean;

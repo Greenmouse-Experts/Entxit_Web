@@ -1,23 +1,17 @@
-import {
-	Dialog,
-	DialogBackdrop,
-	DialogPanel,
-	DialogTitle,
-} from "@headlessui/react";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Search, UsersRound, X } from "lucide-react";
-import { useState } from "react";
+import { UsersRound } from "lucide-react";
+import { useId } from "react";
+import { CommunityPicker } from "@/components/community/CommunityPicker";
+import PageLoader from "@/components/layout/PageLoader";
 import CustomTable, { type columnType } from "@/components/tables/CustomTable";
 import type { Actions } from "@/components/tables/pop-up";
-import { demoCommunities } from "@/data/demo.community";
-import { type DemoTenant, demoTenants } from "@/data/demo.tenants";
 import { pageSizeParam, positiveInt, textParam } from "@/lib/url-search";
+import { subadminService } from "@/services/subadmin.service";
+import type { KycSubmission, SubadminCommunity } from "@/services/types";
 
-type TenantStatus = DemoTenant["status"] | "all";
 type TenantsSearch = {
 	communityId?: string;
-	q?: string;
-	status?: TenantStatus;
 	page?: number;
 	pageSize?: number;
 };
@@ -25,13 +19,6 @@ type TenantsSearch = {
 export const Route = createFileRoute("/community/tenants")({
 	validateSearch: (search: Record<string, unknown>): TenantsSearch => ({
 		communityId: textParam(search.communityId),
-		q: textParam(search.q),
-		status:
-			search.status === "active" ||
-			search.status === "pending" ||
-			search.status === "inactive"
-				? search.status
-				: "all",
 		page: positiveInt(search.page, 1),
 		pageSize: pageSizeParam(search.pageSize),
 	}),
@@ -42,105 +29,117 @@ const dateFormatter = new Intl.DateTimeFormat("en-NG", {
 	day: "numeric",
 	month: "short",
 	year: "numeric",
-	timeZone: "UTC",
 });
-
-const statusClass: Record<DemoTenant["status"], string> = {
-	active: "badge-success",
-	pending: "badge-warning",
-	inactive: "badge-ghost",
-};
-
-const columns: columnType<DemoTenant>[] = [
-	{
-		key: "name",
-		label: "Tenant",
-		render: (_, tenant) => (
-			<div className="flex min-w-52 items-center gap-3">
-				<span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-					{tenant.name
-						.split(" ")
-						.map((part) => part[0])
-						.slice(0, 2)
-						.join("")}
-				</span>
-				<span className="min-w-0">
-					<span className="block font-semibold">{tenant.name}</span>
-					<span className="block truncate text-xs text-base-content/65">
-						{tenant.email}
-					</span>
-				</span>
-			</div>
-		),
-	},
-	{
-		key: "unit",
-		label: "Unit",
-		render: (_, tenant) => <span className="font-medium">{tenant.unit}</span>,
-	},
-	{ key: "type", label: "Type" },
-	{
-		key: "joinedAt",
-		label: "Joined",
-		render: (_, tenant) =>
-			dateFormatter.format(new Date(`${tenant.joinedAt}T00:00:00Z`)),
-	},
-	{
-		key: "status",
-		label: "Status",
-		render: (_, tenant) => (
-			<span
-				className={`badge badge-soft badge-sm capitalize ${statusClass[tenant.status]}`}
-			>
-				{tenant.status}
-			</span>
-		),
-	},
-];
 
 function TenantsPage() {
 	const navigate = Route.useNavigate();
-	const {
-		communityId,
-		q = "",
-		status = "all",
-		page = 1,
-		pageSize = 10,
-	} = Route.useSearch();
-	const [previewTenant, setPreviewTenant] = useState<DemoTenant | null>(null);
-	const selectedCommunity =
-		demoCommunities.find((community) => community.id === communityId) ??
-		demoCommunities[0];
-	const communityTenants = demoTenants.filter(
-		(tenant) => tenant.communityId === selectedCommunity.id,
-	);
-	const activeCount = communityTenants.filter(
-		(tenant) => tenant.status === "active",
-	).length;
-	const pendingCount = communityTenants.filter(
-		(tenant) => tenant.status === "pending",
-	).length;
-	const normalizedQuery = q.trim().toLowerCase();
-	const filtered = communityTenants.filter((tenant) => {
-		const matchesStatus = status === "all" || tenant.status === status;
-		const matchesQuery =
-			!normalizedQuery ||
-			[tenant.name, tenant.email, tenant.unit, tenant.type].some((value) =>
-				value.toLowerCase().includes(normalizedQuery),
-			);
-		return matchesStatus && matchesQuery;
+	const { communityId, page = 1, pageSize = 10 } = Route.useSearch();
+	const communitiesQuery = useQuery({
+		queryKey: ["subadmin", "communities"],
+		queryFn: subadminService.getManagedCommunities,
 	});
-	const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-	const currentPage = Math.min(page, totalPages);
-	const rows = filtered.slice(
-		(currentPage - 1) * pageSize,
-		currentPage * pageSize,
+
+	return (
+		<PageLoader
+			query={communitiesQuery}
+			loadingText="Loading your communities..."
+			emptyState={{
+				title: "No communities yet",
+				description:
+					"Tenant information will appear once a community is assigned to you.",
+			}}
+		>
+			{(response) => {
+				const communities = response.payload.data;
+				const selected =
+					communities.find((community) => community.id === communityId) ??
+					communities[0];
+				if (!selected) return null;
+				return (
+					<TenantApplications
+						community={selected}
+						communities={communities}
+						page={page}
+						pageSize={pageSize}
+						onSelect={(id) =>
+							navigate({
+								search: { communityId: id, page: 1, pageSize },
+								replace: true,
+							})
+						}
+					/>
+				);
+			}}
+		</PageLoader>
 	);
-	const actions: Actions<DemoTenant>[] = [
+}
+
+function TenantApplications({
+	community,
+	communities,
+	page,
+	pageSize,
+	onSelect,
+}: {
+	community: SubadminCommunity;
+	communities: SubadminCommunity[];
+	page: number;
+	pageSize: number;
+	onSelect: (id: string) => void;
+}) {
+	const navigate = Route.useNavigate();
+	const applicationsHeadingId = useId();
+	const applicationsQuery = useQuery({
+		queryKey: ["subadmin", "kyc", "pending", community.id, page, pageSize],
+		queryFn: () =>
+			subadminService.getPendingKyc(community.id, { page, limit: pageSize }),
+	});
+	const columns: columnType<KycSubmission>[] = [
 		{
-			key: "preview",
-			label: "View profile",
-			action: (tenant) => setPreviewTenant(tenant),
+			key: "userName",
+			label: "Applicant",
+			render: (_, item) => (
+				<div>
+					<p className="font-semibold">{item.userName || item.userId}</p>
+					<p className="text-xs text-base-content/65">
+						{item.userEmail || "Email unavailable"}
+					</p>
+				</div>
+			),
+		},
+		{
+			key: "submittedAt",
+			label: "Submitted",
+			render: (_, item) =>
+				item.submittedAt
+					? dateFormatter.format(new Date(item.submittedAt))
+					: "—",
+		},
+		{
+			key: "documents",
+			label: "Documents",
+			render: (_, item) => item.documents?.length ?? 0,
+		},
+		{
+			key: "status",
+			label: "Status",
+			render: (_, item) => (
+				<span className="badge badge-warning badge-soft badge-sm capitalize">
+					{item.status}
+				</span>
+			),
+		},
+	];
+	const actions: Actions<KycSubmission>[] = [
+		{
+			key: "review",
+			label: "Review application",
+			action: (item, nav) =>
+				nav({
+					to: "/community/tenants/$userId",
+					params: { userId: item.userId },
+					search: { communityId: community.id, page, pageSize },
+				}),
 		},
 	];
 
@@ -148,226 +147,86 @@ function TenantsPage() {
 		<div className="space-y-7">
 			<div className="flex flex-wrap items-end justify-between gap-5">
 				<div className="space-y-2">
-					<div className="flex flex-wrap items-center gap-3">
-						<h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-							Tenants
-						</h1>
-						<span className="badge badge-outline badge-sm">Demo data</span>
-					</div>
+					<h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+						Tenants
+					</h1>
 					<p className="max-w-2xl text-sm leading-6 text-base-content/70 sm:text-base">
-						A sample view of the people and spaces in your community.
+						Review people requesting access to {community.name}.
 					</p>
 				</div>
-				<label className="flex min-w-52 flex-col gap-1.5 text-xs font-medium text-base-content/70">
-					Community
-					<select
-						className="select select-bordered w-full bg-base-100 text-sm text-base-content"
-						value={selectedCommunity.id}
-						onChange={(event) =>
-							navigate({
-								search: (prev) => ({
-									...prev,
-									communityId: event.target.value,
-									page: 1,
-								}),
-								replace: true,
-							})
-						}
-					>
-						{demoCommunities.map((community) => (
-							<option key={community.id} value={community.id}>
-								{community.name}
-							</option>
-						))}
-					</select>
-				</label>
+				<CommunityPicker
+					communities={communities}
+					selectedId={community.id}
+					onSelect={onSelect}
+				/>
 			</div>
-
 			<section
 				aria-label="Tenant summary"
-				className="grid overflow-hidden rounded-box border border-base-300 bg-base-100 sm:grid-cols-3"
+				className="grid overflow-hidden rounded-box border border-base-300 bg-base-100 sm:grid-cols-2"
 			>
-				{[
-					{ label: "Total tenants", value: communityTenants.length },
-					{ label: "Active", value: activeCount },
-					{ label: "Pending", value: pendingCount },
-				].map(({ label, value }, index) => (
-					<div
-						key={label}
-						className={`px-6 py-5 ${index > 0 ? "border-t border-base-300 sm:border-l sm:border-t-0" : ""}`}
-					>
-						<p className="text-sm text-base-content/70">{label}</p>
-						<p className="mt-1 text-2xl font-semibold tabular-nums">{value}</p>
-					</div>
-				))}
-			</section>
-
-			<section aria-label="Tenant directory" className="space-y-4">
-				<div className="flex flex-wrap items-end justify-between gap-4">
+				<div className="flex items-start justify-between gap-4 p-6">
 					<div>
-						<h2 className="text-xl font-semibold">Tenant directory</h2>
-						<p className="mt-1 text-sm text-base-content/70">
-							Browse sample records for {selectedCommunity.name}.
+						<p className="text-sm text-base-content/70">Community members</p>
+						<p className="mt-2 text-3xl font-semibold tabular-nums">
+							{community.totalMembers?.toLocaleString() ?? "—"}
 						</p>
 					</div>
-					<div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
-						<label className="input input-bordered flex w-full items-center gap-2 bg-base-100 sm:w-64">
-							<Search
-								aria-hidden="true"
-								className="size-4 text-base-content/60"
-							/>
-							<input
-								value={q}
-								onChange={(event) =>
-									navigate({
-										search: (prev) => ({
-											...prev,
-											q: event.target.value || undefined,
-											page: 1,
-										}),
-										replace: true,
-									})
-								}
-								placeholder="Search tenants"
-								aria-label="Search tenants"
-								className="min-w-0 grow"
-							/>
-						</label>
-						<label className="flex items-center gap-2 text-sm text-base-content/70">
-							<span className="sr-only">Filter by status</span>
-							<select
-								aria-label="Filter by status"
-								className="select select-bordered bg-base-100"
-								value={status}
-								onChange={(event) =>
-									navigate({
-										search: (prev) => ({
-											...prev,
-											status: event.target.value as TenantStatus,
-											page: 1,
-										}),
-										replace: true,
-									})
-								}
-							>
-								<option value="all">All statuses</option>
-								<option value="active">Active</option>
-								<option value="pending">Pending</option>
-								<option value="inactive">Inactive</option>
-							</select>
-						</label>
-					</div>
+					<UsersRound aria-hidden="true" className="size-5 text-primary" />
 				</div>
-				{(q || status !== "all") && (
-					<button
-						type="button"
-						className="btn btn-ghost btn-sm"
-						onClick={() =>
-							navigate({
-								search: (prev) => ({
-									...prev,
-									q: undefined,
-									status: "all",
-									page: 1,
-								}),
-								replace: true,
-							})
-						}
-					>
-						Clear filters
-					</button>
-				)}
-				<CustomTable
-					data={rows}
-					columns={columns}
-					actions={actions}
-					caption={`${selectedCommunity.name} tenants`}
-					emptyMessage="No sample tenants match these filters."
-					totalCount={filtered.length}
-					paginationProps={{
-						page: currentPage,
-						pageSize,
-						totalPages,
-						setPagination: (nextPage, nextSize) =>
-							navigate({
-								search: (prev) => ({
-									...prev,
-									page: nextPage,
-									pageSize: nextSize ?? prev.pageSize,
-								}),
-								replace: true,
-							}),
-					}}
-				/>
+				<div className="border-t border-base-300 p-6 sm:border-l sm:border-t-0">
+					<p className="text-sm text-base-content/70">Pending applications</p>
+					<p className="mt-2 text-3xl font-semibold tabular-nums">
+						{applicationsQuery.data?.payload?.pagination?.total ??
+							applicationsQuery.data?.payload?.total ??
+							"—"}
+					</p>
+				</div>
 			</section>
-
-			<Dialog
-				open={previewTenant !== null}
-				onClose={() => setPreviewTenant(null)}
-				className="relative z-50"
-			>
-				<DialogBackdrop className="fixed inset-0 bg-neutral/55" />
-				<div className="fixed inset-0 flex items-center justify-center p-4">
-					<DialogPanel className="w-full max-w-md rounded-box bg-base-100 p-6 shadow-xl sm:p-8">
-						<div className="flex items-start justify-between gap-4">
-							<div>
-								<DialogTitle className="text-xl font-semibold">
-									Tenant profile
-								</DialogTitle>
-								<p className="mt-1 text-sm text-base-content/70">
-									Sample record
-								</p>
-							</div>
-							<button
-								type="button"
-								className="btn btn-ghost btn-sm btn-square"
-								aria-label="Close profile"
-								onClick={() => setPreviewTenant(null)}
-							>
-								<X aria-hidden="true" className="size-4" />
-							</button>
-						</div>
-						{previewTenant && (
-							<div className="mt-6">
-								<div className="flex items-center gap-3 border-b border-base-300 pb-5">
-									<span className="flex size-11 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-										<UsersRound aria-hidden="true" className="size-5" />
-									</span>
-									<div>
-										<p className="font-semibold">{previewTenant.name}</p>
-										<p className="text-sm text-base-content/70">
-											{previewTenant.email}
-										</p>
-									</div>
-								</div>
-								<dl className="divide-y divide-base-300">
-									{[
-										{ label: "Unit", value: previewTenant.unit },
-										{ label: "Type", value: previewTenant.type },
-										{ label: "Status", value: previewTenant.status },
-										{
-											label: "Joined",
-											value: dateFormatter.format(
-												new Date(`${previewTenant.joinedAt}T00:00:00Z`),
-											),
-										},
-									].map(({ label, value }) => (
-										<div
-											key={label}
-											className="flex justify-between gap-4 py-3 text-sm"
-										>
-											<dt className="text-base-content/65">{label}</dt>
-											<dd className="text-right font-medium capitalize">
-												{value}
-											</dd>
-										</div>
-									))}
-								</dl>
-							</div>
-						)}
-					</DialogPanel>
+			<section aria-labelledby={applicationsHeadingId} className="space-y-4">
+				<div>
+					<h2 id={applicationsHeadingId} className="text-xl font-semibold">
+						Pending applications
+					</h2>
+					<p className="mt-1 text-sm text-base-content/70">
+						Review identity documents before adding a person to this community.
+					</p>
 				</div>
-			</Dialog>
+				<PageLoader
+					query={applicationsQuery}
+					loadingText="Loading applications..."
+				>
+					{(response) => {
+						const payload = response.payload;
+						const rows = payload?.data ?? [];
+						return (
+							<CustomTable
+								data={rows}
+								columns={columns}
+								actions={actions}
+								caption={`${community.name} pending tenant applications`}
+								emptyMessage="No applications are waiting for review."
+								totalCount={
+									payload?.pagination?.total ?? payload?.total ?? rows.length
+								}
+								paginationProps={{
+									page,
+									pageSize,
+									totalPages: payload?.pagination?.pages ?? payload?.pages,
+									setPagination: (nextPage, nextSize) =>
+										navigate({
+											search: {
+												communityId: community.id,
+												page: nextPage,
+												pageSize: nextSize ?? pageSize,
+											},
+											replace: true,
+										}),
+								}}
+							/>
+						);
+					}}
+				</PageLoader>
+			</section>
 		</div>
 	);
 }

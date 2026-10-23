@@ -80,27 +80,45 @@ export const subscriptionService = {
 	// ==========================================
 	// SUBADMIN SUBSCRIPTIONS
 	// ==========================================
-	getSubadminPlans: async (): Promise<ApiResponse<SubscriptionPlan[]>> => {
-		const { data } = await apiClient.get<ApiResponse<SubscriptionPlan[]>>(
-			"/subadmin/subscription-plans",
-		);
+	getSubadminPlans: async (): Promise<
+		ApiResponse<SubscriptionPlan[] | { data: SubscriptionPlan[] }>
+	> => {
+		const { data } = await apiClient.get<
+			ApiResponse<SubscriptionPlan[] | { data: SubscriptionPlan[] }>
+		>("/subadmin/subscription-plans");
 		return data;
 	},
 
 	getCommunitySubscription: async (
 		communityId: string,
-	): Promise<ApiResponse<CommunitySubscription>> => {
-		const { data } = await apiClient.get<ApiResponse<CommunitySubscription>>(
-			`/subadmin/subscription/${communityId}`,
-		);
+	): Promise<
+		ApiResponse<
+			| CommunitySubscription
+			| { data: CommunitySubscription | null }
+			| { subscription: CommunitySubscription | null }
+			| null
+		>
+	> => {
+		const { data } = await apiClient.get<
+			ApiResponse<
+				| CommunitySubscription
+				| { data: CommunitySubscription | null }
+				| { subscription: CommunitySubscription | null }
+				| null
+			>
+		>(`/subadmin/subscription/${communityId}`);
 		return data;
 	},
 
 	getCommunitySubscriptionHistory: async (
 		communityId: string,
-	): Promise<ApiResponse<SubscriptionHistoryItem[]>> => {
+	): Promise<
+		ApiResponse<SubscriptionHistoryItem[] | { data: SubscriptionHistoryItem[] }>
+	> => {
 		const { data } = await apiClient.get<
-			ApiResponse<SubscriptionHistoryItem[]>
+			ApiResponse<
+				SubscriptionHistoryItem[] | { data: SubscriptionHistoryItem[] }
+			>
 		>(`/subadmin/subscription/history/${communityId}`);
 		return data;
 	},

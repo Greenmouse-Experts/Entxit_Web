@@ -16,7 +16,6 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRegisterRouteRouteImport } from './routes/auth/register/route'
 import { Route as AuthVerifyRouteRouteImport } from './routes/auth/verify/route'
 import { Route as CommunityIndexRouteImport } from './routes/community/index'
-import { Route as CommunityAnnouncementsRouteImport } from './routes/community/announcements'
 import { Route as CommunityReportsRouteImport } from './routes/community/reports'
 import { Route as CommunitySecuritiesRouteImport } from './routes/community/securities'
 import { Route as CommunitySettingsRouteImport } from './routes/community/settings'
@@ -36,6 +35,8 @@ import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
 import { Route as AuthLoginIndexRouteImport } from './routes/auth/login.index'
 import { Route as AuthRegisterIndexRouteImport } from './routes/auth/register/index'
 import { Route as AuthVerifyIndexRouteImport } from './routes/auth/verify/index'
+import { Route as CommunityCommunityCommunityIdRouteImport } from './routes/community/community/$communityId'
+import { Route as CommunityTenantsUserIdRouteImport } from './routes/community/tenants/$userId'
 import { Route as DashboardOrganisationsIndexRouteImport } from './routes/dashboard/organisations/index'
 import { Route as DashboardOrganisationsAlertsRouteImport } from './routes/dashboard/organisations/alerts'
 import { Route as DashboardOrganisationsHostsRouteImport } from './routes/dashboard/organisations/hosts'
@@ -43,6 +44,8 @@ import { Route as DashboardOrganisationsKycRouteImport } from './routes/dashboar
 import { Route as DashboardOrganisationsTypesRouteImport } from './routes/dashboard/organisations/types'
 import { Route as DashboardTestIndexRouteImport } from './routes/dashboard/test.index'
 import { Route as AuthRegisterOnBoardingIndexRouteImport } from './routes/auth/register/on-boarding/index'
+import { Route as CommunityCommunityCommunityIdIndexRouteImport } from './routes/community/community/$communityId.index'
+import { Route as CommunityCommunityCommunityIdAnnouncementsIndexRouteImport } from './routes/community/community/$communityId.announcements.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -77,11 +80,6 @@ const AuthVerifyRouteRoute = AuthVerifyRouteRouteImport.update({
 const CommunityIndexRoute = CommunityIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => CommunityRouteRoute,
-} as any)
-const CommunityAnnouncementsRoute = CommunityAnnouncementsRouteImport.update({
-  id: '/announcements',
-  path: '/announcements',
   getParentRoute: () => CommunityRouteRoute,
 } as any)
 const CommunityReportsRoute = CommunityReportsRouteImport.update({
@@ -181,6 +179,17 @@ const AuthVerifyIndexRoute = AuthVerifyIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthVerifyRouteRoute,
 } as any)
+const CommunityCommunityCommunityIdRoute =
+  CommunityCommunityCommunityIdRouteImport.update({
+    id: '/community/$communityId',
+    path: '/community/$communityId',
+    getParentRoute: () => CommunityRouteRoute,
+  } as any)
+const CommunityTenantsUserIdRoute = CommunityTenantsUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => CommunityTenantsRoute,
+} as any)
 const DashboardOrganisationsIndexRoute =
   DashboardOrganisationsIndexRouteImport.update({
     id: '/',
@@ -222,6 +231,18 @@ const AuthRegisterOnBoardingIndexRoute =
     path: '/on-boarding/',
     getParentRoute: () => AuthRegisterRouteRoute,
   } as any)
+const CommunityCommunityCommunityIdIndexRoute =
+  CommunityCommunityCommunityIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => CommunityCommunityCommunityIdRoute,
+  } as any)
+const CommunityCommunityCommunityIdAnnouncementsIndexRoute =
+  CommunityCommunityCommunityIdAnnouncementsIndexRouteImport.update({
+    id: '/announcements/',
+    path: '/announcements/',
+    getParentRoute: () => CommunityCommunityCommunityIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -231,12 +252,11 @@ export interface FileRoutesByFullPath {
   '/auth/register': typeof AuthRegisterRouteRouteWithChildren
   '/auth/verify': typeof AuthVerifyRouteRouteWithChildren
   '/dashboard/organisations': typeof DashboardOrganisationsRouteRouteWithChildren
-  '/community/announcements': typeof CommunityAnnouncementsRoute
   '/community/reports': typeof CommunityReportsRoute
   '/community/securities': typeof CommunitySecuritiesRoute
   '/community/settings': typeof CommunitySettingsRoute
   '/community/subscription': typeof CommunitySubscriptionRoute
-  '/community/tenants': typeof CommunityTenantsRoute
+  '/community/tenants': typeof CommunityTenantsRouteWithChildren
   '/dashboard/announcements': typeof DashboardAnnouncementsRoute
   '/dashboard/audit-logs': typeof DashboardAuditLogsRoute
   '/dashboard/entxit-logs': typeof DashboardEntxitLogsRoute
@@ -248,6 +268,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/users': typeof DashboardUsersRoute
   '/community/': typeof CommunityIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/community/community/$communityId': typeof CommunityCommunityCommunityIdRouteWithChildren
+  '/community/tenants/$userId': typeof CommunityTenantsUserIdRoute
   '/dashboard/organisations/alerts': typeof DashboardOrganisationsAlertsRoute
   '/dashboard/organisations/hosts': typeof DashboardOrganisationsHostsRoute
   '/dashboard/organisations/kyc': typeof DashboardOrganisationsKycRoute
@@ -258,16 +280,17 @@ export interface FileRoutesByFullPath {
   '/dashboard/organisations/': typeof DashboardOrganisationsIndexRoute
   '/dashboard/test/': typeof DashboardTestIndexRoute
   '/auth/register/on-boarding/': typeof AuthRegisterOnBoardingIndexRoute
+  '/community/community/$communityId/': typeof CommunityCommunityCommunityIdIndexRoute
+  '/community/community/$communityId/announcements/': typeof CommunityCommunityCommunityIdAnnouncementsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/community/announcements': typeof CommunityAnnouncementsRoute
   '/community/reports': typeof CommunityReportsRoute
   '/community/securities': typeof CommunitySecuritiesRoute
   '/community/settings': typeof CommunitySettingsRoute
   '/community/subscription': typeof CommunitySubscriptionRoute
-  '/community/tenants': typeof CommunityTenantsRoute
+  '/community/tenants': typeof CommunityTenantsRouteWithChildren
   '/dashboard/announcements': typeof DashboardAnnouncementsRoute
   '/dashboard/audit-logs': typeof DashboardAuditLogsRoute
   '/dashboard/entxit-logs': typeof DashboardEntxitLogsRoute
@@ -279,6 +302,7 @@ export interface FileRoutesByTo {
   '/dashboard/users': typeof DashboardUsersRoute
   '/community': typeof CommunityIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/community/tenants/$userId': typeof CommunityTenantsUserIdRoute
   '/dashboard/organisations/alerts': typeof DashboardOrganisationsAlertsRoute
   '/dashboard/organisations/hosts': typeof DashboardOrganisationsHostsRoute
   '/dashboard/organisations/kyc': typeof DashboardOrganisationsKycRoute
@@ -289,6 +313,8 @@ export interface FileRoutesByTo {
   '/dashboard/organisations': typeof DashboardOrganisationsIndexRoute
   '/dashboard/test': typeof DashboardTestIndexRoute
   '/auth/register/on-boarding': typeof AuthRegisterOnBoardingIndexRoute
+  '/community/community/$communityId': typeof CommunityCommunityCommunityIdIndexRoute
+  '/community/community/$communityId/announcements': typeof CommunityCommunityCommunityIdAnnouncementsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -299,12 +325,11 @@ export interface FileRoutesById {
   '/auth/register': typeof AuthRegisterRouteRouteWithChildren
   '/auth/verify': typeof AuthVerifyRouteRouteWithChildren
   '/dashboard/organisations': typeof DashboardOrganisationsRouteRouteWithChildren
-  '/community/announcements': typeof CommunityAnnouncementsRoute
   '/community/reports': typeof CommunityReportsRoute
   '/community/securities': typeof CommunitySecuritiesRoute
   '/community/settings': typeof CommunitySettingsRoute
   '/community/subscription': typeof CommunitySubscriptionRoute
-  '/community/tenants': typeof CommunityTenantsRoute
+  '/community/tenants': typeof CommunityTenantsRouteWithChildren
   '/dashboard/announcements': typeof DashboardAnnouncementsRoute
   '/dashboard/audit-logs': typeof DashboardAuditLogsRoute
   '/dashboard/entxit-logs': typeof DashboardEntxitLogsRoute
@@ -316,6 +341,8 @@ export interface FileRoutesById {
   '/dashboard/users': typeof DashboardUsersRoute
   '/community/': typeof CommunityIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/community/community/$communityId': typeof CommunityCommunityCommunityIdRouteWithChildren
+  '/community/tenants/$userId': typeof CommunityTenantsUserIdRoute
   '/dashboard/organisations/alerts': typeof DashboardOrganisationsAlertsRoute
   '/dashboard/organisations/hosts': typeof DashboardOrganisationsHostsRoute
   '/dashboard/organisations/kyc': typeof DashboardOrganisationsKycRoute
@@ -326,6 +353,8 @@ export interface FileRoutesById {
   '/dashboard/organisations/': typeof DashboardOrganisationsIndexRoute
   '/dashboard/test/': typeof DashboardTestIndexRoute
   '/auth/register/on-boarding/': typeof AuthRegisterOnBoardingIndexRoute
+  '/community/community/$communityId/': typeof CommunityCommunityCommunityIdIndexRoute
+  '/community/community/$communityId/announcements/': typeof CommunityCommunityCommunityIdAnnouncementsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -337,7 +366,6 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/verify'
     | '/dashboard/organisations'
-    | '/community/announcements'
     | '/community/reports'
     | '/community/securities'
     | '/community/settings'
@@ -354,6 +382,8 @@ export interface FileRouteTypes {
     | '/dashboard/users'
     | '/community/'
     | '/dashboard/'
+    | '/community/community/$communityId'
+    | '/community/tenants/$userId'
     | '/dashboard/organisations/alerts'
     | '/dashboard/organisations/hosts'
     | '/dashboard/organisations/kyc'
@@ -364,11 +394,12 @@ export interface FileRouteTypes {
     | '/dashboard/organisations/'
     | '/dashboard/test/'
     | '/auth/register/on-boarding/'
+    | '/community/community/$communityId/'
+    | '/community/community/$communityId/announcements/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
-    | '/community/announcements'
     | '/community/reports'
     | '/community/securities'
     | '/community/settings'
@@ -385,6 +416,7 @@ export interface FileRouteTypes {
     | '/dashboard/users'
     | '/community'
     | '/dashboard'
+    | '/community/tenants/$userId'
     | '/dashboard/organisations/alerts'
     | '/dashboard/organisations/hosts'
     | '/dashboard/organisations/kyc'
@@ -395,6 +427,8 @@ export interface FileRouteTypes {
     | '/dashboard/organisations'
     | '/dashboard/test'
     | '/auth/register/on-boarding'
+    | '/community/community/$communityId'
+    | '/community/community/$communityId/announcements'
   id:
     | '__root__'
     | '/'
@@ -404,7 +438,6 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/verify'
     | '/dashboard/organisations'
-    | '/community/announcements'
     | '/community/reports'
     | '/community/securities'
     | '/community/settings'
@@ -421,6 +454,8 @@ export interface FileRouteTypes {
     | '/dashboard/users'
     | '/community/'
     | '/dashboard/'
+    | '/community/community/$communityId'
+    | '/community/tenants/$userId'
     | '/dashboard/organisations/alerts'
     | '/dashboard/organisations/hosts'
     | '/dashboard/organisations/kyc'
@@ -431,6 +466,8 @@ export interface FileRouteTypes {
     | '/dashboard/organisations/'
     | '/dashboard/test/'
     | '/auth/register/on-boarding/'
+    | '/community/community/$communityId/'
+    | '/community/community/$communityId/announcements/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -492,13 +529,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/community/'
       preLoaderRoute: typeof CommunityIndexRouteImport
-      parentRoute: typeof CommunityRouteRoute
-    }
-    '/community/announcements': {
-      id: '/community/announcements'
-      path: '/announcements'
-      fullPath: '/community/announcements'
-      preLoaderRoute: typeof CommunityAnnouncementsRouteImport
       parentRoute: typeof CommunityRouteRoute
     }
     '/community/reports': {
@@ -634,6 +664,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthVerifyIndexRouteImport
       parentRoute: typeof AuthVerifyRouteRoute
     }
+    '/community/community/$communityId': {
+      id: '/community/community/$communityId'
+      path: '/community/$communityId'
+      fullPath: '/community/community/$communityId'
+      preLoaderRoute: typeof CommunityCommunityCommunityIdRouteImport
+      parentRoute: typeof CommunityRouteRoute
+    }
+    '/community/tenants/$userId': {
+      id: '/community/tenants/$userId'
+      path: '/$userId'
+      fullPath: '/community/tenants/$userId'
+      preLoaderRoute: typeof CommunityTenantsUserIdRouteImport
+      parentRoute: typeof CommunityTenantsRoute
+    }
     '/dashboard/organisations/': {
       id: '/dashboard/organisations/'
       path: '/'
@@ -683,27 +727,71 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterOnBoardingIndexRouteImport
       parentRoute: typeof AuthRegisterRouteRoute
     }
+    '/community/community/$communityId/': {
+      id: '/community/community/$communityId/'
+      path: '/'
+      fullPath: '/community/community/$communityId/'
+      preLoaderRoute: typeof CommunityCommunityCommunityIdIndexRouteImport
+      parentRoute: typeof CommunityCommunityCommunityIdRoute
+    }
+    '/community/community/$communityId/announcements/': {
+      id: '/community/community/$communityId/announcements/'
+      path: '/announcements'
+      fullPath: '/community/community/$communityId/announcements/'
+      preLoaderRoute: typeof CommunityCommunityCommunityIdAnnouncementsIndexRouteImport
+      parentRoute: typeof CommunityCommunityCommunityIdRoute
+    }
   }
 }
 
+interface CommunityTenantsRouteChildren {
+  CommunityTenantsUserIdRoute: typeof CommunityTenantsUserIdRoute
+}
+
+const CommunityTenantsRouteChildren: CommunityTenantsRouteChildren = {
+  CommunityTenantsUserIdRoute: CommunityTenantsUserIdRoute,
+}
+
+const CommunityTenantsRouteWithChildren =
+  CommunityTenantsRoute._addFileChildren(CommunityTenantsRouteChildren)
+
+interface CommunityCommunityCommunityIdRouteChildren {
+  CommunityCommunityCommunityIdIndexRoute: typeof CommunityCommunityCommunityIdIndexRoute
+  CommunityCommunityCommunityIdAnnouncementsIndexRoute: typeof CommunityCommunityCommunityIdAnnouncementsIndexRoute
+}
+
+const CommunityCommunityCommunityIdRouteChildren: CommunityCommunityCommunityIdRouteChildren =
+  {
+    CommunityCommunityCommunityIdIndexRoute:
+      CommunityCommunityCommunityIdIndexRoute,
+    CommunityCommunityCommunityIdAnnouncementsIndexRoute:
+      CommunityCommunityCommunityIdAnnouncementsIndexRoute,
+  }
+
+const CommunityCommunityCommunityIdRouteWithChildren =
+  CommunityCommunityCommunityIdRoute._addFileChildren(
+    CommunityCommunityCommunityIdRouteChildren,
+  )
+
 interface CommunityRouteRouteChildren {
-  CommunityAnnouncementsRoute: typeof CommunityAnnouncementsRoute
   CommunityReportsRoute: typeof CommunityReportsRoute
   CommunitySecuritiesRoute: typeof CommunitySecuritiesRoute
   CommunitySettingsRoute: typeof CommunitySettingsRoute
   CommunitySubscriptionRoute: typeof CommunitySubscriptionRoute
-  CommunityTenantsRoute: typeof CommunityTenantsRoute
+  CommunityTenantsRoute: typeof CommunityTenantsRouteWithChildren
   CommunityIndexRoute: typeof CommunityIndexRoute
+  CommunityCommunityCommunityIdRoute: typeof CommunityCommunityCommunityIdRouteWithChildren
 }
 
 const CommunityRouteRouteChildren: CommunityRouteRouteChildren = {
-  CommunityAnnouncementsRoute: CommunityAnnouncementsRoute,
   CommunityReportsRoute: CommunityReportsRoute,
   CommunitySecuritiesRoute: CommunitySecuritiesRoute,
   CommunitySettingsRoute: CommunitySettingsRoute,
   CommunitySubscriptionRoute: CommunitySubscriptionRoute,
-  CommunityTenantsRoute: CommunityTenantsRoute,
+  CommunityTenantsRoute: CommunityTenantsRouteWithChildren,
   CommunityIndexRoute: CommunityIndexRoute,
+  CommunityCommunityCommunityIdRoute:
+    CommunityCommunityCommunityIdRouteWithChildren,
 }
 
 const CommunityRouteRouteWithChildren = CommunityRouteRoute._addFileChildren(
