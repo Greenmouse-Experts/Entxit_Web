@@ -9,10 +9,10 @@ function RouteComponent() {
   return (
     <>
       <HomeNav />
-      <section className="min-h-[calc(100dvh-5rem)] w-full container mx-auto">
+      <section className="min-h-[calc(100dvh-5rem)] w-full container mx-auto ">
         <div className="flex min-h-[calc(100dvh-5rem)] w-full flex-col md:w-1/2 ">
           <div className="flex flex-1 items-center  ">
-            <div className="mx-auto w-full ring  p-4 fade rounded-xl">
+            <div className="mx-auto w-full ring  p-4 fade rounded-xl py-8 lg:py-2">
               <Outlet />
             </div>
           </div>
