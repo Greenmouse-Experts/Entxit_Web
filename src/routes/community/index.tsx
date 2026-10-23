@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	ArrowRight,
@@ -10,8 +9,7 @@ import {
 	UsersRound,
 } from "lucide-react";
 import { useId } from "react";
-import PageLoader from "@/components/layout/PageLoader";
-import { subadminService } from "@/services/subadmin.service";
+import { demoCommunities } from "@/data/demo.community";
 import type { SubadminCommunity } from "@/services/types";
 
 type CommunitySearch = { communityId?: string };
@@ -32,37 +30,18 @@ const count = (value?: number) =>
 function CommunityDashboardPage() {
 	const navigate = Route.useNavigate();
 	const { communityId } = Route.useSearch();
-	const communitiesQuery = useQuery({
-		queryKey: ["subadmin", "communities"],
-		queryFn: subadminService.getManagedCommunities,
-	});
+	const selected =
+		demoCommunities.find((community) => community.id === communityId) ??
+		demoCommunities[0];
 
 	return (
-		<PageLoader
-			query={communitiesQuery}
-			loadingText="Loading your communities..."
-			emptyState={{
-				title: "No communities yet",
-				description: "Your managed communities will appear here once assigned.",
-			}}
-		>
-			{(response) => {
-				const communities = response.payload ?? [];
-				const selected =
-					communities.find((community) => community.id === communityId) ??
-					communities[0];
-				if (!selected) return null;
-				return (
-					<CommunityOverview
-						community={selected}
-						communities={communities}
-						onSelect={(id) =>
-							navigate({ search: { communityId: id }, replace: true })
-						}
-					/>
-				);
-			}}
-		</PageLoader>
+		<CommunityOverview
+			community={selected}
+			communities={demoCommunities}
+			onSelect={(id) =>
+				navigate({ search: { communityId: id }, replace: true })
+			}
+		/>
 	);
 }
 
@@ -85,9 +64,12 @@ function CommunityOverview({
 		<div className="space-y-8">
 			<div className="flex flex-wrap items-end justify-between gap-5">
 				<div className="min-w-0 space-y-2">
-					<h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-						{community.name}
-					</h1>
+					<div className="flex flex-wrap items-center gap-3">
+						<h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+							{community.name}
+						</h1>
+						<span className="badge badge-outline badge-sm">Demo data</span>
+					</div>
 					<p className="max-w-2xl text-sm leading-6 text-base-content/70 sm:text-base">
 						A clear view of your people, security team, and community details.
 					</p>
@@ -185,10 +167,10 @@ function CommunityOverview({
 					</dl>
 					<Link
 						to="/community/settings"
-						search={{ communityId: community.id }}
 						className="btn btn-outline btn-sm mt-6 gap-2"
 					>
-						<Settings2 aria-hidden="true" className="size-4" /> Edit details
+						<Settings2 aria-hidden="true" className="size-4" /> Community
+						settings
 					</Link>
 				</section>
 

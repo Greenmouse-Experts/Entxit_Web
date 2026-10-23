@@ -1,12 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
-@import 'tailwindcss';
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
 
 @plugin 'daisyui' {
   themes: false;
 }
 
 @plugin 'daisyui/theme' {
-  name: 'entxit';
+  name: "entxit";
   default: true;
   color-scheme: light;
   --color-base-100: #ffffff;
@@ -38,7 +38,12 @@ body {
   margin: 0;
   background: var(--color-base-100);
   color: var(--color-base-content);
-  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    "IBM Plex Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -54,37 +59,80 @@ code {
 /* Use the theme colors for the login surface instead of fixed RGB values. */
 .auth-glow {
   background:
-    radial-gradient(circle at 30% 20%, color-mix(in oklab, var(--color-primary) 15%, transparent), transparent 50%),
-    radial-gradient(circle at 80% 80%, color-mix(in oklab, var(--color-success) 15%, transparent), transparent 50%),
-    radial-gradient(circle at 40% 90%, color-mix(in oklab, var(--color-success) 12%, transparent), transparent 50%);
+    radial-gradient(
+      circle at 30% 20%,
+      color-mix(in oklab, var(--color-primary) 15%, transparent),
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      color-mix(in oklab, var(--color-success) 15%, transparent),
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 90%,
+      color-mix(in oklab, var(--color-success) 12%, transparent),
+      transparent 50%
+    );
 }
 
 .auth-grid {
   background-image:
-    linear-gradient(color-mix(in oklab, var(--color-primary) 3%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklab, var(--color-primary) 3%, transparent) 1px, transparent 1px);
+    linear-gradient(
+      color-mix(in oklab, var(--color-primary) 3%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--color-primary) 3%, transparent) 1px,
+      transparent 1px
+    );
   background-size: 64px 64px;
 }
 
 @keyframes entxit-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes entxit-zoom-in {
-  from { opacity: 0; transform: scale(.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes entxit-rise-in {
-  from { opacity: 0; transform: translateY(.5rem); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes entxit-spin-reverse {
-  to { transform: rotate(-360deg); }
+  to {
+    transform: rotate(-360deg);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [class*="animate-[entxit-"] { animation: none; }
+  [class*="animate-[entxit-"] {
+    animation: none;
+  }
+}
+
+@utility fade {
+  @apply border-current/20 ring-current/20;
 }
