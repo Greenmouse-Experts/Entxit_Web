@@ -44,7 +44,7 @@ function RouteComponent() {
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold tracking-tight">Get started</h1>
           <p className="text-base-content/60 text-sm">
-            Create your account to start managing your business.
+            Create your account to start managing your Community.
           </p>
         </div>
 
