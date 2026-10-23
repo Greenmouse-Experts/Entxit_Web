@@ -7,6 +7,7 @@ export interface OnboardingFormData {
 	communityCity: string;
 	communityCountry: string;
 	communityState: string;
+	tenantCount: string;
 }
 
 interface OnboardingState {
@@ -25,6 +26,7 @@ const defaultFormData: OnboardingFormData = {
 	communityCity: "",
 	communityCountry: "Nigeria",
 	communityState: "",
+	tenantCount: "",
 };
 
 export const useOnboardingStore = create<OnboardingState>()(
@@ -41,7 +43,7 @@ export const useOnboardingStore = create<OnboardingState>()(
 		}),
 		{
 			name: "onboarding-storage",
-			version: 1,
+			version: 2,
 			migrate: (persistedState) => {
 				const previous = persistedState as {
 					formData?: Record<string, unknown>;
@@ -61,6 +63,7 @@ export const useOnboardingStore = create<OnboardingState>()(
 						communityState: String(
 							data.communityState ?? data.companyState ?? "",
 						),
+						tenantCount: String(data.tenantCount ?? ""),
 					},
 				};
 			},

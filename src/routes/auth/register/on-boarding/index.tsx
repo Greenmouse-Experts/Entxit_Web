@@ -4,6 +4,8 @@ import { Country, State } from "country-state-city";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { type FormEvent, useId, useMemo, useState } from "react";
 import { toast } from "sonner";
+import SelectImage from "@/components/images/SelectImage";
+import { useSelectImage } from "@/components/images/useImages";
 import apiClient from "@/lib/api-client";
 import { extract_message } from "@/lib/api-error";
 import {
@@ -49,6 +51,8 @@ function OnboardingWizard() {
 	const [state, setState] = useState(formData.communityState);
 	const [address, setAddress] = useState(formData.communityAddress);
 	const [city, setCity] = useState(formData.communityCity);
+	const [tenantCount, setTenantCount] = useState(formData.tenantCount);
+	const profileImage = useSelectImage();
 	const countries = useMemo(() => Country.getAllCountries(), []);
 	const states = useMemo(
 		() => State.getStatesOfCountry(countryCode),
@@ -63,7 +67,13 @@ function OnboardingWizard() {
 				companyCity: data.communityCity,
 				companyCountry: data.communityCountry,
 				companyState: data.communityState,
+				currentTenantCount: Number(data.tenantCount),
 			});
+			if (profileImage.image) {
+				const body = new FormData();
+				body.append("profileImage", profileImage.image);
+				await apiClient.post("/tenant/onboarding/profile-image", body);
+			}
 			await apiClient.post("/tenant/onboarding/complete");
 		},
 		onSuccess: () => {
@@ -76,8 +86,8 @@ function OnboardingWizard() {
 
 	function saveFacility(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		if (!facilityType) return;
-		updateFormData({ facilityType });
+		if (!facilityType || !tenantCount) return;
+		updateFormData({ facilityType, tenantCount });
 		nextStep();
 	}
 
@@ -87,6 +97,7 @@ function OnboardingWizard() {
 		const data: OnboardingFormData = {
 			...formData,
 			facilityType,
+			tenantCount,
 			communityAddress: address.trim(),
 			communityCity: city.trim(),
 			communityCountry: country?.name ?? "Nigeria",
@@ -151,6 +162,27 @@ function OnboardingWizard() {
 							</option>
 						))}
 					</select>
+					<div className="space-y-1.5">
+						<label
+							htmlFor={`${id}-tenantCount`}
+							className="block text-sm font-medium"
+						>
+							Current number of tenants
+						</label>
+						<input
+							id={`${id}-tenantCount`}
+							name="tenantCount"
+							type="number"
+							min={0}
+							step={1}
+							inputMode="numeric"
+							className="input input-bordered w-full"
+							value={tenantCount}
+							onChange={(event) => setTenantCount(event.target.value)}
+							required
+						/>
+					</div>
+					<SelectImage title="Profile image (optional)" {...profileImage} />
 					<div className="flex justify-end">
 						<button type="submit" className="btn btn-primary">
 							Continue <ArrowRight aria-hidden="true" className="size-4" />
