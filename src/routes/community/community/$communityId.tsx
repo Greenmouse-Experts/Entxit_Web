@@ -94,6 +94,14 @@ function CommunityLayout() {
 									Overview
 								</Link>
 								<Link
+									to="/community/community/$communityId/tenants"
+									params={{ communityId }}
+									className="border-b-2 border-transparent px-4 py-3 text-sm font-medium text-base-content/70 hover:text-base-content"
+									activeProps={{ className: "border-primary text-primary" }}
+								>
+									Tenants
+								</Link>
+								<Link
 									to="/community/community/$communityId/announcements"
 									params={{ communityId }}
 									className="border-b-2 border-transparent px-4 py-3 text-sm font-medium text-base-content/70 hover:text-base-content"

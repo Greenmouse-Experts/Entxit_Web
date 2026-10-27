@@ -46,6 +46,7 @@ import { Route as DashboardTestIndexRouteImport } from './routes/dashboard/test.
 import { Route as AuthRegisterOnBoardingIndexRouteImport } from './routes/auth/register/on-boarding/index'
 import { Route as CommunityCommunityCommunityIdIndexRouteImport } from './routes/community/community/$communityId.index'
 import { Route as CommunityCommunityCommunityIdAnnouncementsIndexRouteImport } from './routes/community/community/$communityId.announcements.index'
+import { Route as CommunityCommunityCommunityIdTenantsIndexRouteImport } from './routes/community/community/$communityId.tenants.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -243,6 +244,12 @@ const CommunityCommunityCommunityIdAnnouncementsIndexRoute =
     path: '/announcements/',
     getParentRoute: () => CommunityCommunityCommunityIdRoute,
   } as any)
+const CommunityCommunityCommunityIdTenantsIndexRoute =
+  CommunityCommunityCommunityIdTenantsIndexRouteImport.update({
+    id: '/tenants/',
+    path: '/tenants/',
+    getParentRoute: () => CommunityCommunityCommunityIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -282,6 +289,7 @@ export interface FileRoutesByFullPath {
   '/auth/register/on-boarding/': typeof AuthRegisterOnBoardingIndexRoute
   '/community/community/$communityId/': typeof CommunityCommunityCommunityIdIndexRoute
   '/community/community/$communityId/announcements/': typeof CommunityCommunityCommunityIdAnnouncementsIndexRoute
+  '/community/community/$communityId/tenants/': typeof CommunityCommunityCommunityIdTenantsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -315,6 +323,7 @@ export interface FileRoutesByTo {
   '/auth/register/on-boarding': typeof AuthRegisterOnBoardingIndexRoute
   '/community/community/$communityId': typeof CommunityCommunityCommunityIdIndexRoute
   '/community/community/$communityId/announcements': typeof CommunityCommunityCommunityIdAnnouncementsIndexRoute
+  '/community/community/$communityId/tenants': typeof CommunityCommunityCommunityIdTenantsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -355,6 +364,7 @@ export interface FileRoutesById {
   '/auth/register/on-boarding/': typeof AuthRegisterOnBoardingIndexRoute
   '/community/community/$communityId/': typeof CommunityCommunityCommunityIdIndexRoute
   '/community/community/$communityId/announcements/': typeof CommunityCommunityCommunityIdAnnouncementsIndexRoute
+  '/community/community/$communityId/tenants/': typeof CommunityCommunityCommunityIdTenantsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -396,6 +406,7 @@ export interface FileRouteTypes {
     | '/auth/register/on-boarding/'
     | '/community/community/$communityId/'
     | '/community/community/$communityId/announcements/'
+    | '/community/community/$communityId/tenants/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -429,6 +440,7 @@ export interface FileRouteTypes {
     | '/auth/register/on-boarding'
     | '/community/community/$communityId'
     | '/community/community/$communityId/announcements'
+    | '/community/community/$communityId/tenants'
   id:
     | '__root__'
     | '/'
@@ -468,6 +480,7 @@ export interface FileRouteTypes {
     | '/auth/register/on-boarding/'
     | '/community/community/$communityId/'
     | '/community/community/$communityId/announcements/'
+    | '/community/community/$communityId/tenants/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -741,6 +754,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommunityCommunityCommunityIdAnnouncementsIndexRouteImport
       parentRoute: typeof CommunityCommunityCommunityIdRoute
     }
+    '/community/community/$communityId/tenants/': {
+      id: '/community/community/$communityId/tenants/'
+      path: '/tenants'
+      fullPath: '/community/community/$communityId/tenants/'
+      preLoaderRoute: typeof CommunityCommunityCommunityIdTenantsIndexRouteImport
+      parentRoute: typeof CommunityCommunityCommunityIdRoute
+    }
   }
 }
 
@@ -758,6 +778,7 @@ const CommunityTenantsRouteWithChildren =
 interface CommunityCommunityCommunityIdRouteChildren {
   CommunityCommunityCommunityIdIndexRoute: typeof CommunityCommunityCommunityIdIndexRoute
   CommunityCommunityCommunityIdAnnouncementsIndexRoute: typeof CommunityCommunityCommunityIdAnnouncementsIndexRoute
+  CommunityCommunityCommunityIdTenantsIndexRoute: typeof CommunityCommunityCommunityIdTenantsIndexRoute
 }
 
 const CommunityCommunityCommunityIdRouteChildren: CommunityCommunityCommunityIdRouteChildren =
@@ -766,6 +787,8 @@ const CommunityCommunityCommunityIdRouteChildren: CommunityCommunityCommunityIdR
       CommunityCommunityCommunityIdIndexRoute,
     CommunityCommunityCommunityIdAnnouncementsIndexRoute:
       CommunityCommunityCommunityIdAnnouncementsIndexRoute,
+    CommunityCommunityCommunityIdTenantsIndexRoute:
+      CommunityCommunityCommunityIdTenantsIndexRoute,
   }
 
 const CommunityCommunityCommunityIdRouteWithChildren =

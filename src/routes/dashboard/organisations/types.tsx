@@ -1,31 +1,29 @@
-import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { toast } from "sonner";
 import { ManagedTypePanel } from "@/components/organisations/ManagedTypePanel";
 import { OrganisationShell } from "@/components/organisations/OrganisationShell";
 import { adminService } from "@/services/admin.service";
+import { usersService } from "@/services/users.service";
 
 export const Route = createFileRoute("/dashboard/organisations/types")({
 	component: TypesPage,
 });
 
 function TypesPage() {
-	const [categoryName, setCategoryName] = useState("");
-	const createCategory = useMutation({
-		mutationFn: (name: string) => adminService.createHostCategory({ name }),
-		onSuccess: () => {
-			setCategoryName("");
-			toast.success("Host category created");
-		},
-		onError: () => toast.error("Could not create host category"),
-	});
 	return (
 		<OrganisationShell
 			title="Community types"
-			description="Maintain the options used when communities and KYC documents are created."
+			description="Manage the classifications and document options used across communities."
 		>
 			<div className="grid gap-5 xl:grid-cols-2">
+				<ManagedTypePanel
+					title="Host categories"
+					description="Categories available when creating a community."
+					queryKey="host-categories"
+					load={async () => (await usersService.getHostCategories()).payload}
+					create={(name) => adminService.createHostCategory({ name })}
+					addLabel="Add category"
+					emptyMessage="No host categories have been added yet."
+				/>
 				<ManagedTypePanel
 					title="Community types"
 					description="Community classifications available to the platform."
@@ -45,36 +43,6 @@ function TypesPage() {
 					remove={adminService.deleteKycDocumentType}
 				/>
 			</div>
-			<section className="rounded-box border border-base-300 bg-base-100 p-5 shadow-sm">
-				<h2 className="text-lg font-semibold">New host category</h2>
-				<p className="mt-1 text-sm text-base-content/60">
-					The API supports creating a category. Category listing is not
-					available from this admin endpoint.
-				</p>
-				<form
-					className="mt-4 flex flex-wrap gap-2"
-					onSubmit={(event) => {
-						event.preventDefault();
-						if (categoryName.trim()) createCategory.mutate(categoryName.trim());
-					}}
-				>
-					<input
-						className="input input-bordered min-w-48 flex-1"
-						aria-label="New host category name"
-						placeholder="Category name"
-						value={categoryName}
-						onChange={(event) => setCategoryName(event.target.value)}
-						required
-					/>
-					<button
-						type="submit"
-						className="btn btn-primary"
-						disabled={!categoryName.trim() || createCategory.isPending}
-					>
-						Create category
-					</button>
-				</form>
-			</section>
 		</OrganisationShell>
 	);
 }

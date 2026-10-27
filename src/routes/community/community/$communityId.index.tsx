@@ -129,8 +129,8 @@ function CommunityOverview() {
 							<ArrowRight aria-hidden="true" className="size-4" />
 						</Link>
 						<Link
-							to="/community/tenants"
-							search={{ communityId: community.id }}
+							to="/community/community/$communityId/tenants"
+							params={{ communityId: community.id }}
 							className="flex min-h-14 items-center gap-3 py-3 text-sm font-medium hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-content"
 						>
 							<UsersRound aria-hidden="true" className="size-5" />{" "}

@@ -16,17 +16,27 @@ export function ManagedTypePanel({
 	load,
 	create,
 	remove,
+	addLabel = "Add type",
+	emptyMessage = "No types have been added yet.",
 }: {
 	title: string;
 	description: string;
 	queryKey: string;
-	load: () => Promise<NamedType[]>;
+	load: () => Promise<NamedType[] | { data: NamedType[] }>;
 	create: (name: string) => Promise<unknown>;
-	remove: (id: string) => Promise<unknown>;
+	remove?: (id: string) => Promise<unknown>;
+	addLabel?: string;
+	emptyMessage?: string;
 }) {
 	const queryClient = useQueryClient();
 	const [name, setName] = useState("");
-	const query = useQuery({ queryKey: ["admin", queryKey], queryFn: load });
+	const query = useQuery({
+		queryKey: ["admin", queryKey],
+		queryFn: async () => {
+			const payload = await load();
+			return Array.isArray(payload) ? payload : payload.data;
+		},
+	});
 	const createMutation = useMutation({
 		mutationFn: create,
 		onSuccess: async () => {
@@ -37,7 +47,10 @@ export function ManagedTypePanel({
 		onError: () => toast.error(`Could not add ${title.toLowerCase()}`),
 	});
 	const deleteMutation = useMutation({
-		mutationFn: remove,
+		mutationFn: (id: string) => {
+			if (!remove) throw new Error("Delete is unavailable for this type");
+			return remove(id);
+		},
 		onSuccess: async () => {
 			toast.success("Type deleted");
 			await queryClient.invalidateQueries({ queryKey: ["admin", queryKey] });
@@ -58,7 +71,7 @@ export function ManagedTypePanel({
 				<input
 					className="input input-bordered min-w-48 flex-1"
 					aria-label={`New ${title.toLowerCase()} name`}
-					placeholder="New type name"
+					placeholder="Name"
 					value={name}
 					onChange={(event) => setName(event.target.value)}
 					required
@@ -69,7 +82,7 @@ export function ManagedTypePanel({
 					disabled={!name.trim() || createMutation.isPending}
 				>
 					<Plus aria-hidden="true" className="size-4" />
-					Add type
+					{addLabel}
 				</button>
 			</form>
 			<div className="mt-4 divide-y divide-base-200">
@@ -77,7 +90,7 @@ export function ManagedTypePanel({
 					{(types) =>
 						types.length === 0 ? (
 							<p className="py-8 text-center text-sm text-base-content/60">
-								No types have been added yet.
+								{emptyMessage}
 							</p>
 						) : (
 							types.map((type) => (
@@ -86,18 +99,20 @@ export function ManagedTypePanel({
 									className="flex items-center justify-between gap-3 py-3"
 								>
 									<span className="font-medium">{type.name}</span>
-									<button
-										type="button"
-										className="btn btn-ghost btn-sm text-error"
-										aria-label={`Delete ${type.name}`}
-										disabled={deleteMutation.isPending}
-										onClick={() => {
-											if (window.confirm(`Delete ${type.name}?`))
-												deleteMutation.mutate(type.id);
-										}}
-									>
-										<Trash2 aria-hidden="true" className="size-4" />
-									</button>
+									{remove && (
+										<button
+											type="button"
+											className="btn btn-ghost btn-sm text-error"
+											aria-label={`Delete ${type.name}`}
+											disabled={deleteMutation.isPending}
+											onClick={() => {
+												if (window.confirm(`Delete ${type.name}?`))
+													deleteMutation.mutate(type.id);
+											}}
+										>
+											<Trash2 aria-hidden="true" className="size-4" />
+										</button>
+									)}
 								</div>
 							))
 						)
